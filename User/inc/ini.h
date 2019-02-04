@@ -40,6 +40,7 @@
 #define POROG_MAX 105
 #define POROG_MIN 95
 
+#define MODE_PROJECT 1
 
 void DAC2_PortE_ini(void);
 void LED_PortB_ini(void);
