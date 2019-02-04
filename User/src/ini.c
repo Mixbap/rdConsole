@@ -282,8 +282,135 @@ void TIMER_CAPTURE_ini(void)
   TIMER_Cmd (RD_TIMER, ENABLE);	
 
 }
-//--------------------------------------------------------------
-//--------------------------------------------------------------
+
+//------------------------------------------------------------
+// Инициализация UART1+DMA TX (XS9 18 pin)
+//------------------------------------------------------------
+void UART1_DMA_TX_PB5_ini(void)
+{
+	PORT_InitTypeDef PortB_Ini;
+	UART_InitTypeDef UART1_Ini;
+	
+	RST_CLK_PCLKcmd(RST_CLK_PCLK_PORTB, ENABLE);
+	
+	
+  PortB_Ini.PORT_FUNC  = PORT_FUNC_ALTER;
+  PortB_Ini.PORT_MODE  = PORT_MODE_DIGITAL;
+  PortB_Ini.PORT_SPEED = PORT_SPEED_FAST;
+  PortB_Ini.PORT_Pin   = PORT_Pin_5;
+  PortB_Ini.PORT_OE    = PORT_OE_OUT;
+  PORT_Init(MDR_PORTB, &PortB_Ini);
+	
+	PortB_Ini.PORT_Pin   = PORT_Pin_6;
+  PortB_Ini.PORT_OE    = PORT_OE_IN;
+	PORT_Init(MDR_PORTB, &PortB_Ini);
+
+	RST_CLK_PCLKcmd(RST_CLK_PCLK_UART1, ENABLE);
+	
+	UART_DeInit(MDR_UART1);
+	UART_BRGInit(MDR_UART1, UART_HCLKdiv1);
+	UART_StructInit (&UART1_Ini);
+	
+	UART1_Ini.UART_BaudRate = 9600;
+	UART1_Ini.UART_FIFOMode = UART_FIFO_OFF;
+	UART1_Ini.UART_HardwareFlowControl = UART_HardwareFlowControl_TXE | UART_HardwareFlowControl_RXE;
+	UART1_Ini.UART_Parity = UART_Parity_No;
+	UART1_Ini.UART_StopBits = UART_StopBits1;
+	UART1_Ini.UART_WordLength = UART_WordLength8b;
+	UART_Init(MDR_UART1, &UART1_Ini);
+
+	UART_DMAConfig(MDR_UART1,UART_IT_FIFO_LVL_8words,UART_IT_FIFO_LVL_8words);
+	
+	UART_DMACmd(MDR_UART1, UART_DMA_TXE, ENABLE);
+	UART_DMACmd(MDR_UART1, UART_DMA_RXE, ENABLE);
+	
+	UART_Cmd(MDR_UART1, ENABLE);
+}
+//------------------------------------------------------------
+// Инициализация DMA
+//------------------------------------------------------------
+void DMA_ini()
+{
+	DMA_ChannelInitTypeDef DMA_InitStr;
+
+	//CLK ON (SSP1 and SSP2 ON --/--> error)
+	RST_CLK_PCLKcmd(RST_CLK_PCLK_DMA | RST_CLK_PCLK_SSP1 | RST_CLK_PCLK_SSP2, ENABLE);
+	
+	//Global Interruts OFF
+	NVIC->ICPR[0] = 0xFFFFFFFF;
+	NVIC->ICER[0] = 0xFFFFFFFF;
+
+	DMA_DeInit();
+	DMA_StructInit(&DMA_InitStr);
+
+	MDR_DMA->CHNL_REQ_MASK_CLR = 0xFFFFFFFF;
+  MDR_DMA->CHNL_USEBURST_CLR = 0xFFFFFFFF;
+
+}
+
+//------------------------------------------------------------
+// Запуск DMA на передачу (UART1)
+//------------------------------------------------------------
+void DMA_TX_start(uint8_t* buf, uint32_t buf_size)
+{
+	DMA_CtrlDataInitTypeDef DMA_PriCtrlStr;
+	DMA_ChannelInitTypeDef DMA_InitStr;
+	
+	DMA_DeInit();
+	DMA_StructInit(&DMA_InitStr);
+
+	DMA_PriCtrlStr.DMA_SourceBaseAddr = (uint32_t)buf;
+  DMA_PriCtrlStr.DMA_DestBaseAddr = (uint32_t)(&(MDR_UART1->DR));
+  DMA_PriCtrlStr.DMA_SourceIncSize = DMA_SourceIncByte;
+  DMA_PriCtrlStr.DMA_DestIncSize = DMA_DestIncNo;
+  DMA_PriCtrlStr.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
+  DMA_PriCtrlStr.DMA_Mode = DMA_Mode_Basic;
+  DMA_PriCtrlStr.DMA_CycleSize = buf_size;
+  DMA_PriCtrlStr.DMA_NumContinuous = DMA_Transfers_1;
+  DMA_PriCtrlStr.DMA_SourceProtCtrl = DMA_SourcePrivileged;
+  DMA_PriCtrlStr.DMA_DestProtCtrl = DMA_DestPrivileged;
+	
+	DMA_InitStr.DMA_PriCtrlData = &DMA_PriCtrlStr;
+  DMA_InitStr.DMA_Priority = DMA_Priority_Default;
+  DMA_InitStr.DMA_UseBurst = DMA_BurstClear;
+  DMA_InitStr.DMA_SelectDataStructure = DMA_CTRL_DATA_PRIMARY;
+
+  DMA_Init(DMA_Channel_UART1_TX, &DMA_InitStr);
+	
+	while ((DMA_GetFlagStatus(DMA_Channel_UART1_TX, DMA_FLAG_CHNL_ENA ))); // проверка конца передачи
+}
+
+//------------------------------------------------------------
+// Запуск DMA на прием(UART1)
+//------------------------------------------------------------
+void DMA_RX_start(uint8_t* buf, uint32_t buf_size)
+{
+	DMA_CtrlDataInitTypeDef DMA_PriCtrlStr;
+	DMA_ChannelInitTypeDef DMA_InitStr;
+	
+	DMA_DeInit();
+	DMA_StructInit(&DMA_InitStr);
+	
+	DMA_PriCtrlStr.DMA_SourceBaseAddr = (uint32_t)(&(MDR_UART1->DR));
+  DMA_PriCtrlStr.DMA_DestBaseAddr = (uint32_t)buf;
+  DMA_PriCtrlStr.DMA_SourceIncSize = DMA_SourceIncNo;
+  DMA_PriCtrlStr.DMA_DestIncSize = DMA_DestIncByte;
+  DMA_PriCtrlStr.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
+  DMA_PriCtrlStr.DMA_Mode = DMA_Mode_Basic;
+  DMA_PriCtrlStr.DMA_CycleSize = buf_size;
+  DMA_PriCtrlStr.DMA_NumContinuous = DMA_Transfers_1;
+  DMA_PriCtrlStr.DMA_SourceProtCtrl = DMA_SourcePrivileged;
+  DMA_PriCtrlStr.DMA_DestProtCtrl = DMA_DestPrivileged;
+	
+	DMA_InitStr.DMA_PriCtrlData = &DMA_PriCtrlStr;
+  DMA_InitStr.DMA_Priority = DMA_Priority_High;
+  DMA_InitStr.DMA_UseBurst = DMA_BurstClear;
+  DMA_InitStr.DMA_SelectDataStructure = DMA_CTRL_DATA_PRIMARY;
+
+  DMA_Init(DMA_Channel_UART1_RX, &DMA_InitStr);
+	
+	while ((DMA_GetFlagStatus(DMA_Channel_UART1_RX, DMA_FLAG_CHNL_ENA ))); // проверка конца передачи
+}
 
 
 
