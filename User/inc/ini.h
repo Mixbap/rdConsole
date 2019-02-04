@@ -8,6 +8,8 @@
 #include "MDR32F9Qx_dac.h"              // Keil::Drivers:DAC
 #include "MDR32F9Qx_timer.h"            // Keil::Drivers:TIMER
 #include "MDR32F9Qx_dma.h"              // Keil::Drivers:DMA
+#include "MDR32F9Qx_eeprom.h"           // Keil::Drivers:EEMPROM
+#include "MDR32F9Qx_uart.h"             // Keil::Drivers:UART
 
 //------------------------------------------------------------
 #define LED0_ON		PORT_SetBits(MDR_PORTB, PORT_Pin_0)
@@ -25,6 +27,8 @@
 #define MODULATOR_FREQ 100000
 #define MODULATOR_PERIOD(F)  ((uint16_t)((uint32_t)(80000000) / (uint32_t)(F * MODULATOR_BUFF)) - 1)
 #define MODULATOR_AMPLITUDE 2047
+#define MODULATOR_AMPLITUDE_PILA 4095
+#define MODULATOR_AMPLITUDE_TRIANGLE 4095
 #define MODULATOR_CONST 2047
 
 #define RD_PORT	    MDR_PORTC					
@@ -42,6 +46,8 @@ void LED_PortB_ini(void);
 void CLK_80_ini(void);
 void DAC2_ini(void);
 void Sin_massiv(void);
+void Pila_massiv(void);
+void Triangle_massiv(void);
 void DMA_DAC2_ini(void);
 void TIMER1_ini(void);
 void Modulator_ini(void);

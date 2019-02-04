@@ -5,6 +5,8 @@ DMA_CtrlDataInitTypeDef DMA_InitStructure;
 DMA_ChannelInitTypeDef DMA_Channel_InitStructure;
 
 uint16_t sin_mod[MODULATOR_BUFF] = {0};
+uint16_t triangle_mod[MODULATOR_BUFF] = {0};
+uint16_t pila_mod[MODULATOR_BUFF] = {0};
 
 /*
 // Отчеты синуса
@@ -46,13 +48,11 @@ void DAC2_PortE_ini(void)
 	PORT_InitTypeDef PortE_Ini;
 	RST_CLK_PCLKcmd(RST_CLK_PCLK_PORTE, ENABLE);
 	
-
 	PortE_Ini.PORT_MODE = PORT_MODE_ANALOG;
 	PortE_Ini.PORT_OE = PORT_OE_OUT;
 	PortE_Ini.PORT_Pin = PORT_Pin_0;
 	PortE_Ini.PORT_PULL_DOWN = PORT_PULL_DOWN_OFF;
 	PortE_Ini.PORT_PULL_UP = PORT_PULL_UP_OFF;
-
 
 	PORT_Init(MDR_PORTE, &PortE_Ini);
 }
@@ -77,7 +77,6 @@ void LED_PortB_ini(void)
 {
 	PORT_InitTypeDef PortB_Ini;
 	RST_CLK_PCLKcmd(RST_CLK_PCLK_PORTB, ENABLE);
-	
 	
 	PortB_Ini.PORT_FUNC = PORT_FUNC_PORT;
 	PortB_Ini.PORT_MODE = PORT_MODE_DIGITAL;
@@ -104,6 +103,43 @@ void Sin_massiv(void)
      sin_mod[i] = MODULATOR_CONST + MODULATOR_AMPLITUDE * sin(w * i);
   }
 }
+//------------------------------------------------------------
+// Расчет массива отсчетов пилы
+//------------------------------------------------------------
+void Pila_massiv(void)
+{
+	uint32_t i;
+	float k;
+	
+	k = (float)(MODULATOR_AMPLITUDE_PILA) / MODULATOR_BUFF;
+	
+	for (i = 0; i < MODULATOR_BUFF-1; i++)
+	{
+		pila_mod[i] = k * i;
+	}
+	pila_mod[MODULATOR_BUFF-1] = pila_mod[0];
+}
+
+//------------------------------------------------------------
+// Расчет массива отсчетов треугольника
+//------------------------------------------------------------
+void Triangle_massiv(void)
+{
+	uint32_t i;
+	float k;
+	
+	k = (float)(MODULATOR_AMPLITUDE_TRIANGLE * 2) / MODULATOR_BUFF;
+	
+	for (i = 0; i < MODULATOR_BUFF/2; i++)
+	{
+		triangle_mod[i] = k * i;
+	}
+		for (i = MODULATOR_BUFF/2; i < MODULATOR_BUFF; i++)
+	{
+		triangle_mod[i] = k * (MODULATOR_BUFF-i);
+	}
+}
+
 //------------------------------------------------------------
 //Инициализация DAC2+DMA+TIM1
 //------------------------------------------------------------
@@ -180,6 +216,8 @@ void TIMER1_ini(void)
 void Modulator_ini(void)
 {
 	Sin_massiv();
+	Pila_massiv();
+	Triangle_massiv();
 	
 	DMA_DAC2_ini();
 	
