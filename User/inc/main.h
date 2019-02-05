@@ -16,4 +16,6 @@ uint8_t buf3[20] = "\r\n";
 uint8_t firstIrq = 0;
 uint8_t flagConsole = 0;
 
+void checkLimits(void);
+
 #endif

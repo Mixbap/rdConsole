@@ -10,13 +10,7 @@ void test(void)
 	DMA_RX_start(buf0, 3); // Ввод 3 значений (не меньше не больше), можно меньше но добить пробелами
 	DMA_TX_start(buf0, 20);
 	DMA_TX_start(buf3, 20);
-	
-	// постоянно долбит ДМА УАРТ
-	//Modulator_ini();
-	//TIMER_CAPTURE_ini();
-	//NVIC_EnableIRQ(EXT_INT2_IRQn);
-	
-	
+		
 	UART_Cmd(MDR_UART1, DISABLE); // для нормальной работы ЦАП и ДМА
 	flagConsole = 1;
 }
