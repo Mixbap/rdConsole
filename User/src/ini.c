@@ -329,7 +329,7 @@ void UART1_DMA_TX_PB5_ini(void)
 //------------------------------------------------------------
 // Инициализация DMA
 //------------------------------------------------------------
-void DMA_ini()
+void DMA_ini(void)
 {
 	DMA_ChannelInitTypeDef DMA_InitStr;
 
@@ -411,6 +411,28 @@ void DMA_RX_start(uint8_t* buf, uint32_t buf_size)
 	
 	while ((DMA_GetFlagStatus(DMA_Channel_UART1_RX, DMA_FLAG_CHNL_ENA ))); // проверка конца передачи
 }
+
+//------------------------------------------------------------
+// Инициализация внешнего прерывания по PB10 (XS9 23 pin)
+//------------------------------------------------------------
+void PortB_EXT_ini(void)
+{
+	PORT_InitTypeDef PortB_Ini;
+	//RST_CLK_PCLKcmd(RST_CLK_PCLK_PORTB, ENABLE);
+	
+	// XS9 23 pin
+	PortB_Ini.PORT_FUNC = PORT_FUNC_ALTER;
+	PortB_Ini.PORT_MODE = PORT_MODE_DIGITAL;
+	PortB_Ini.PORT_OE = PORT_OE_IN;
+	PortB_Ini.PORT_Pin = PORT_Pin_10;
+	PortB_Ini.PORT_PULL_DOWN = PORT_PULL_DOWN_ON;
+	PortB_Ini.PORT_PULL_UP = PORT_PULL_UP_OFF;
+	PortB_Ini.PORT_SPEED = PORT_SPEED_MAXFAST;
+
+	PORT_Init(MDR_PORTB, &PortB_Ini);
+}
+
+
 
 
 

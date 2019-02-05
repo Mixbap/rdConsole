@@ -5,78 +5,73 @@ int main(void)
 {
 	CLK_80_ini();
 	LED_PortB_ini();
+	PortB_EXT_ini();
 	
-	if (MODE_PROJECT)
-	{
-		Modulator_ini();
-		TIMER_CAPTURE_ini();
-	}
-	else
-	{
-		DMA_ini(); 							// Инициализация DMA
-		UART1_DMA_TX_PB5_ini(); // Инициализация UART1+DMA TX (XS9 18 pin)
+	Modulator_ini();
+	TIMER_CAPTURE_ini();
 	
-		DMA_TX_start(buf1, 20);
-		DMA_TX_start(buf2, 20);
-		DMA_RX_start(buf0, 3); // Ввод 3 значений (не меньше не больше), можно меньше но добить пробелами
-		DMA_TX_start(buf0, 20);
-		DMA_TX_start(buf3, 20);
-	}
-
+	NVIC_EnableIRQ(EXT_INT2_IRQn);
 	
 	while(1)
 	{
-		
-		if (Flag_IRQ == 1)
+		if (flagConsole)
 		{
-			RD = RD_TIMER->CNT;
-			RD_TIMER->CNT = 0;
-			Flag_IRQ = 0;
-			LED0_OFF;
-			LED1_OFF;
+			Modulator_ini();
+			TIMER_CAPTURE_ini();
+			NVIC_EnableIRQ(EXT_INT2_IRQn);
 		}
-		
-	//--------------------------------------------	
-	if (RD > POROG_MIN)
-	{
-		if (RD < POROG_MAX)
-		{
-			n++;
-		}
-		else
-		{
-			if (n>0)
+			
+			if (Flag_IRQ == 1)
 			{
-				n--;
+				RD = RD_TIMER->CNT;
+				RD_TIMER->CNT = 0;
+				Flag_IRQ = 0;
+				LED0_OFF;
+				LED1_OFF;
 			}
-		}
-	}
-	else
-	{
-		if (n>0)
-		{
-			n--;
-		}
-	}
-	//--------------------------------------------	
-		if (RD > POROG_MIN)
-		{
-			LED0_ON;
-		}
-		
-		if (RD < POROG_MAX)
-		{
-			LED1_ON;
-		}
-	//------------------------------------------
-		if (n == POROG_NAKOPLENIE)
-		{
-			LED3_ON;
-			LED2_OFF;
-			n = 0;
-		}
-	
+			
+		//--------------------------------------------	
+			if (RD > POROG_MIN)
+			{
+				if (RD < POROG_MAX)
+				{
+					n++;
+				}
+				else
+				{
+					if (n>0)
+					{
+						n--;
+					}
+				}
+			}
+			else
+			{
+				if (n>0)
+				{
+					n--;
+				}
+			}
+		//--------------------------------------------	
+			if (RD > POROG_MIN)
+			{
+				LED0_ON;
+			}
+			
+			if (RD < POROG_MAX)
+			{
+				LED1_ON;
+			}
+		//------------------------------------------
+			if (n == POROG_NAKOPLENIE)
+			{
+				LED3_ON;
+				LED2_OFF;
+				n = 0;
+			}
+
 	}
 }
-//------------------------------------------------------------
-//------------------------------------------------------------
+
+
+
