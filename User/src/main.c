@@ -16,12 +16,12 @@ int main(void)
 	{
 		if (flagConsole)
 		{
-			Modulator_ini();
-			TIMER_CAPTURE_ini();
-			NVIC_EnableIRQ(EXT_INT2_IRQn);
+			Modulator_ini(); 								// Инициализация модулятора
+			TIMER_CAPTURE_ini(); 						// Инициализация таймера в режиме захвата (PC2 XS9 26 pin)
+			NVIC_EnableIRQ(EXT_INT2_IRQn); 	// Разрешение внешних прерываний по PB10 (XS9 23 pin) 
 		}
 		
-		checkLimits();
+		checkLimits(); // Проверка попадания в пороги
 	}
 }
 

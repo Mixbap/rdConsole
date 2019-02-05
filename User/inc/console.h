@@ -11,7 +11,9 @@ uint8_t buf3[20] = "\r\n";
 
 extern uint8_t flagConsole;
 
-void test(void);
+void runConsole(void);
+void printMenu(void);
+uint8_t readData(void);
 
 #endif
 
