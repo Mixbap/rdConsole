@@ -3,9 +3,9 @@
 <title>Static Call Graph - [.\Objects\rdConsole.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\rdConsole.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060300: Last Updated: Tue Feb 05 14:57:51 2019
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060300: Last Updated: Wed Feb 06 09:26:01 2019
 <BR><P>
-<H3>Maximum Stack Usage =        288 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
+<H3>Maximum Stack Usage =        584 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
 EXT_INT2_IRQHandler &rArr; runConsole &rArr; printMenu &rArr; DMA_TX_start &rArr; DMA_Init
 <P>
@@ -562,7 +562,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[1f]"></a>EXT_INT2_IRQHandler</STRONG> (Thumb, 36 bytes, Stack size 8 bytes, it.o(i.EXT_INT2_IRQHandler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 288<LI>Call Chain = EXT_INT2_IRQHandler &rArr; runConsole &rArr; printMenu &rArr; DMA_TX_start &rArr; DMA_Init
+<BR><BR>[Stack]<UL><LI>Max Depth = 584<LI>Call Chain = EXT_INT2_IRQHandler &rArr; runConsole &rArr; printMenu &rArr; DMA_TX_start &rArr; DMA_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;runConsole
 <LI><a href="#[55]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PORT_SetBits
@@ -595,7 +595,7 @@ Global Symbols
 <P><STRONG><a name="[46]"></a>PORT_Init</STRONG> (Thumb, 450 bytes, Stack size 48 bytes, mdr32f9qx_port.o(i.PORT_Init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = PORT_Init
 </UL>
-<BR>[Called By]<UL><LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_DMA_TX_PB5_ini
+<BR>[Called By]<UL><LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_DMA_ini
 <LI><a href="#[6d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIMER_CAPTURE_ini
 <LI><a href="#[60]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PortB_EXT_ini
 <LI><a href="#[57]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED_PortB_ini
@@ -689,7 +689,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[45]"></a>RST_CLK_PCLKcmd</STRONG> (Thumb, 26 bytes, Stack size 0 bytes, mdr32f9qx_rst_clk.o(i.RST_CLK_PCLKcmd))
-<BR><BR>[Called By]<UL><LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_DMA_TX_PB5_ini
+<BR><BR>[Called By]<UL><LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_DMA_ini
 <LI><a href="#[6d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIMER_CAPTURE_ini
 <LI><a href="#[5c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIMER1_ini
 <LI><a href="#[57]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LED_PortB_ini
@@ -820,8 +820,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[58]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Modulator_ini
 </UL>
 
-<P><STRONG><a name="[74]"></a>UART1_DMA_TX_PB5_ini</STRONG> (Thumb, 184 bytes, Stack size 32 bytes, ini.o(i.UART1_DMA_TX_PB5_ini))
-<BR><BR>[Stack]<UL><LI>Max Depth = 140<LI>Call Chain = UART1_DMA_TX_PB5_ini &rArr; UART_Init &rArr; RST_CLK_GetClocksFreq
+<P><STRONG><a name="[74]"></a>UART1_DMA_ini</STRONG> (Thumb, 184 bytes, Stack size 32 bytes, ini.o(i.UART1_DMA_ini))
+<BR><BR>[Stack]<UL><LI>Max Depth = 140<LI>Call Chain = UART1_DMA_ini &rArr; UART_Init &rArr; RST_CLK_GetClocksFreq
 </UL>
 <BR>[Calls]<UL><LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_StructInit
 <LI><a href="#[78]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_Init
@@ -837,26 +837,26 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[76]"></a>UART_BRGInit</STRONG> (Thumb, 48 bytes, Stack size 0 bytes, mdr32f9qx_uart.o(i.UART_BRGInit))
-<BR><BR>[Called By]<UL><LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_DMA_TX_PB5_ini
+<BR><BR>[Called By]<UL><LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_DMA_ini
 </UL>
 
 <P><STRONG><a name="[7b]"></a>UART_Cmd</STRONG> (Thumb, 24 bytes, Stack size 0 bytes, mdr32f9qx_uart.o(i.UART_Cmd))
 <BR><BR>[Called By]<UL><LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;runConsole
-<LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_DMA_TX_PB5_ini
+<LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_DMA_ini
 </UL>
 
 <P><STRONG><a name="[7a]"></a>UART_DMACmd</STRONG> (Thumb, 24 bytes, Stack size 8 bytes, mdr32f9qx_uart.o(i.UART_DMACmd))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = UART_DMACmd
 </UL>
-<BR>[Called By]<UL><LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_DMA_TX_PB5_ini
+<BR>[Called By]<UL><LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_DMA_ini
 </UL>
 
 <P><STRONG><a name="[79]"></a>UART_DMAConfig</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, mdr32f9qx_uart.o(i.UART_DMAConfig))
-<BR><BR>[Called By]<UL><LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_DMA_TX_PB5_ini
+<BR><BR>[Called By]<UL><LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_DMA_ini
 </UL>
 
 <P><STRONG><a name="[75]"></a>UART_DeInit</STRONG> (Thumb, 38 bytes, Stack size 0 bytes, mdr32f9qx_uart.o(i.UART_DeInit))
-<BR><BR>[Called By]<UL><LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_DMA_TX_PB5_ini
+<BR><BR>[Called By]<UL><LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_DMA_ini
 </UL>
 
 <P><STRONG><a name="[78]"></a>UART_Init</STRONG> (Thumb, 162 bytes, Stack size 64 bytes, mdr32f9qx_uart.o(i.UART_Init))
@@ -864,11 +864,11 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[7c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RST_CLK_GetClocksFreq
 </UL>
-<BR>[Called By]<UL><LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_DMA_TX_PB5_ini
+<BR>[Called By]<UL><LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_DMA_ini
 </UL>
 
 <P><STRONG><a name="[77]"></a>UART_StructInit</STRONG> (Thumb, 24 bytes, Stack size 0 bytes, mdr32f9qx_uart.o(i.UART_StructInit))
-<BR><BR>[Called By]<UL><LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_DMA_TX_PB5_ini
+<BR><BR>[Called By]<UL><LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_DMA_ini
 </UL>
 
 <P><STRONG><a name="[87]"></a>__ARM_fpclassify</STRONG> (Thumb, 40 bytes, Stack size 0 bytes, fpclassify.o(i.__ARM_fpclassify))
@@ -971,8 +971,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[2f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__rt_entry_main
 </UL>
 
-<P><STRONG><a name="[8f]"></a>printMenu</STRONG> (Thumb, 78 bytes, Stack size 128 bytes, console.o(i.printMenu))
-<BR><BR>[Stack]<UL><LI>Max Depth = 216<LI>Call Chain = printMenu &rArr; DMA_TX_start &rArr; DMA_Init
+<P><STRONG><a name="[8f]"></a>printMenu</STRONG> (Thumb, 186 bytes, Stack size 360 bytes, console.o(i.printMenu))
+<BR><BR>[Stack]<UL><LI>Max Depth = 448<LI>Call Chain = printMenu &rArr; DMA_TX_start &rArr; DMA_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[53]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DMA_TX_start
 <LI><a href="#[90]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memcpy4
@@ -990,13 +990,13 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;runConsole
 </UL>
 
-<P><STRONG><a name="[56]"></a>runConsole</STRONG> (Thumb, 118 bytes, Stack size 64 bytes, console.o(i.runConsole))
-<BR><BR>[Stack]<UL><LI>Max Depth = 280<LI>Call Chain = runConsole &rArr; printMenu &rArr; DMA_TX_start &rArr; DMA_Init
+<P><STRONG><a name="[56]"></a>runConsole</STRONG> (Thumb, 120 bytes, Stack size 128 bytes, console.o(i.runConsole))
+<BR><BR>[Stack]<UL><LI>Max Depth = 576<LI>Call Chain = runConsole &rArr; printMenu &rArr; DMA_TX_start &rArr; DMA_Init
 </UL>
 <BR>[Calls]<UL><LI><a href="#[91]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;readData
 <LI><a href="#[8f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;printMenu
 <LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_Cmd
-<LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_DMA_TX_PB5_ini
+<LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_DMA_ini
 <LI><a href="#[54]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DMA_ini
 <LI><a href="#[53]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DMA_TX_start
 <LI><a href="#[90]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memcpy4

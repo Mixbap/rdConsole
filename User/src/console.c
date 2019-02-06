@@ -6,12 +6,12 @@
 void runConsole(void)
 {
 	uint8_t act = 1;
-	uint8_t n[] = "Coefficient = \r\n";
-	uint8_t m[] = "Exit terminal succesful!\r\n";
-	uint8_t k[] = "FFFF\r\n";
+	uint8_t mode[] = "Type of the modulating voltage\r\n1. Sinis\r\n2. Saw\r\n3. Triangle";
+	uint8_t m[] = "Exit terminal succesfull!\r\n";
+	uint8_t unsupCommand[] = "Unsupported command!\r\n";
 	
 	DMA_ini(); 							// Инициализация DMA
-	UART1_DMA_TX_PB5_ini(); // Инициализация UART1+DMA TX (XS9 18 pin)
+	UART1_DMA_ini(); 				// Инициализация UART1+DMA TX RX
 	
 	while (act)
 	{
@@ -21,14 +21,14 @@ void runConsole(void)
 		switch (readData())
 		{
 		case 0x31: //1
-			DMA_TX_start(n, sizeof(n));
+			DMA_TX_start(mode, sizeof(mode));
 			break;
-		case 0x32: //2
+		case 0x38: //8
 			DMA_TX_start(m, sizeof(m));
 			act = 0;
 			break;
 		default:
-			DMA_TX_start(k, sizeof(k));
+			DMA_TX_start(unsupCommand, sizeof(unsupCommand));
 			break;
 		}
 	}
@@ -49,11 +49,23 @@ void runConsole(void)
 void printMenu(void)
 {
 	uint8_t hello[] = "\n\tTerminal of the block of processing of the radio sensor.\r\n";
-	uint8_t param[] = "1. Adjustment coefficient\r\n";
-	uint8_t exit[] = "2. Exit terminal\r\n";
+	uint8_t mode[] = "1. Type of the modulating voltage\r\n";
+	uint8_t freq[] = "2. Frequency of the modulating voltage\r\n";
+	uint8_t modeBuf[] = "3. Size of the buffer of counting\r\n";
+	uint8_t modeAmp[] = "4. Maximum amplitude of the modulating voltage\r\n";
+	uint8_t freqBw[] = "5. Bandwidth of frequency of beats\r\n";
+	uint8_t limit[] = "6. Limit accumulation\r\n";
+	uint8_t param[] = "7. Adjustment coefficient\r\n";
+	uint8_t exit[] = "8. Exit terminal\r\n";
 	uint8_t cursor[] = "\n>> ";
 	
 	DMA_TX_start(hello, sizeof(hello));
+	DMA_TX_start(mode, sizeof(mode));
+	DMA_TX_start(freq, sizeof(freq));
+	DMA_TX_start(modeBuf, sizeof(modeBuf));
+	DMA_TX_start(modeAmp, sizeof(modeAmp));
+	DMA_TX_start(freqBw, sizeof(freqBw));
+	DMA_TX_start(limit, sizeof(limit));
 	DMA_TX_start(param, sizeof(param));
 	DMA_TX_start(exit, sizeof(exit));
 	DMA_TX_start(cursor, sizeof(cursor));
