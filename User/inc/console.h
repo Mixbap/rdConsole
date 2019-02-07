@@ -16,6 +16,7 @@ extern uint8_t flagConsole;
 void runConsole(void);
 void printMenu(void);
 uint8_t readData(void);
+uint8_t interpret(uint8_t value);
 
 #endif
 
