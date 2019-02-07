@@ -1,36 +1,5 @@
 Objects/
+Listings/
 *.uvguix
 *.uvoptx
-Objects/ini.crf
-Objects/ini.o
-Objects/rdConsole.axf
-Objects/rdConsole.build_log.htm
-Objects/rdConsole.htm
-Objects/rdConsole_Target 1.dep
-Objects/rdConsole_Target 1.dep
-Objects/rdConsole.htm
-Objects/rdConsole.build_log.htm
-Objects/rdConsole.axf
-Objects/ini.o
-Objects/ini.crf
-Objects/console.o
-Objects/console.crf
-Listings/rdConsole.map
-Objects/rdConsole_Target 1.dep
-Objects/rdConsole.htm
-Objects/rdConsole.build_log.htm
-Objects/rdConsole.axf
-Objects/ini.o
-Objects/ini.crf
-Objects/console.o
-Objects/console.crf
-Listings/rdConsole.map
-Listings/rdConsole.map
-Objects/console.crf
-Objects/console.o
-Objects/ini.crf
-Objects/ini.o
-Objects/rdConsole.axf
-Objects/rdConsole.build_log.htm
-Objects/rdConsole.htm
-Objects/rdConsole_Target 1.dep
+
