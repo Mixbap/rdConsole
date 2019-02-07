@@ -409,7 +409,7 @@ void DMA_RX_start(uint8_t* buf, uint32_t buf_size)
 
   DMA_Init(DMA_Channel_UART1_RX, &DMA_InitStr);
 	
-	while ((DMA_GetFlagStatus(DMA_Channel_UART1_RX, DMA_FLAG_CHNL_ENA ))); // проверка конца передачи
+	//while ((DMA_GetFlagStatus(DMA_Channel_UART1_RX, DMA_FLAG_CHNL_ENA ))); // проверка конца приема
 }
 
 //------------------------------------------------------------
