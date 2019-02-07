@@ -50,7 +50,7 @@ void runConsole(void)
 		case 8:
 			DMA_TX_start(exit, sizeof(exit));
 			act = 0;
-			break;
+			break;	
 		default:
 			DMA_TX_start(unsupCommand, sizeof(unsupCommand));
 			break;
@@ -76,9 +76,6 @@ void printMenu(void)
 	uint8_t param[] = "7. Adjustment coefficient\r\n";
 	uint8_t exit[] = "8. Exit terminal\r\n";
 	
-	uint8_t data0[20] = {0};
-	DMA_RX_start(data0, sizeof(data0)); // заглушка для DMA Rx (на избыточное количество входных данных)
-	
 	DMA_TX_start(hello, sizeof(hello));
 	DMA_TX_start(mode, sizeof(mode));
 	DMA_TX_start(freq, sizeof(freq));
@@ -96,10 +93,9 @@ void printMenu(void)
 //--------------------------------------------------------------
 uint8_t readData(void)
 {
-	uint8_t data[2] = {0};
-	DMA_RX_start(data, sizeof(data));	
-	while ((DMA_GetFlagStatus(DMA_Channel_UART1_RX, DMA_FLAG_CHNL_ENA )));
-	
+	uint8_t data[20] = {0};
+	DMA_RX_start(data, sizeof(data));
+
 	DMA_TX_start(transferLine, sizeof(transferLine));
 	return interpret(data[0]);
 }

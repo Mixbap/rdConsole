@@ -387,6 +387,7 @@ void DMA_RX_start(uint8_t* buf, uint32_t buf_size)
 {
 	DMA_CtrlDataInitTypeDef DMA_PriCtrlStr;
 	DMA_ChannelInitTypeDef DMA_InitStr;
+	uint8_t idx = 0;
 	
 	DMA_DeInit();
 	DMA_StructInit(&DMA_InitStr);
@@ -408,6 +409,16 @@ void DMA_RX_start(uint8_t* buf, uint32_t buf_size)
   DMA_InitStr.DMA_SelectDataStructure = DMA_CTRL_DATA_PRIMARY;
 
   DMA_Init(DMA_Channel_UART1_RX, &DMA_InitStr);
+	
+	// проверка конца приема нажатием enter
+	while(1)
+	{
+		for (idx = 0; idx < buf_size; idx++)
+		{
+			if (buf[idx] == 13)  // enter
+				return;
+		}
+	}
 	
 	//while ((DMA_GetFlagStatus(DMA_Channel_UART1_RX, DMA_FLAG_CHNL_ENA ))); // проверка конца приема
 }
