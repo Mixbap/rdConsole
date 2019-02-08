@@ -5,7 +5,7 @@
 void runConsole(void)
 {
 	uint8_t act = 1;
-	uint8_t mode[] = "Type of the modulating voltage:\r\n1. Sinus\r\n2. Saw\r\n3. Triangle";
+	uint8_t mode[] = "Type of the modulating voltage:\r\n1. Sinus\r\n2. Saw\r\n3. Triangle\r\n";
 	uint8_t freq[] = "Enter frequency (kHz):\r\n";
 	uint8_t modeBuf[] = "Enter the buffer size:\r\n";
 	uint8_t modeAmp[] = "Enter amplitude:\r\n";
@@ -27,6 +27,7 @@ void runConsole(void)
 		{
 		case 1:
 			DMA_TX_start(mode, sizeof(mode));
+			typeModHandler();
 			break;
 		case 2:
 			DMA_TX_start(freq, sizeof(freq));
@@ -104,16 +105,13 @@ uint8_t readData(void)
 	uint8_t data[20] = {0};
 	uint8_t idx = 0;
 	uint8_t res = 0;
-	//uint8_t i = 0;
+	
 	idx = DMA_RX_start(data, sizeof(data));
 	DMA_TX_start(transferLine, sizeof(transferLine));
 	
 	res = dataInterpret(data, idx);
-
-	if (res > 10)
-		LED0_ON;
 	
-	return res;//interpret(data[0]);
+	return res;
 }
 //--------------------------------------------------------------
 // Интерпретатор ASCII цифр
@@ -143,24 +141,45 @@ uint8_t dataInterpret(uint8_t* data, uint8_t idx)
 {
 	uint8_t i = 0;
 	uint8_t result = 0;
-	uint8_t d[20];
 	
 	// Интрепретация массива данных по ASCII
 	for (i = 0; i < idx; i++)
 	{
-		d[i] = interpret(data[i]);
+		data[i] = interpret(data[i]);
 	}
 
 	// Интерпретация целой части
 	for (i = 0; i < idx; i++)
 	{
-		result = result + (d[i] * (uint8_t)pow(10, idx - 1 - i));
+		result = result + (data[i] * (uint8_t)pow(10, idx - 1 - i));
 	}
 
 	return result;
 }
 
-
+//--------------------------------------------------------------
+// Задание формы модулирующего напряжения
+//--------------------------------------------------------------
+void typeModHandler(void)
+{
+	uint8_t result;
+	uint8_t unsupCommand[] = "Unsupported command!\r\n";
+	
+	while (1)
+	{
+		DMA_TX_start(cursor, sizeof(cursor));
+		result = readData();
+		if (result > 3)
+		{
+			DMA_TX_start(unsupCommand, sizeof(unsupCommand));
+		}
+		else 
+		{
+			param.typeMod = result;
+			return;
+		}
+	}
+}
 
 
 
