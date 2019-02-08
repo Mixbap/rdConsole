@@ -383,7 +383,7 @@ void DMA_TX_start(uint8_t* buf, uint32_t buf_size)
 //------------------------------------------------------------
 // Запуск DMA на прием(UART1)
 //------------------------------------------------------------
-void DMA_RX_start(uint8_t* buf, uint32_t buf_size)
+uint8_t DMA_RX_start(uint8_t* buf, uint32_t buf_size)
 {
 	DMA_CtrlDataInitTypeDef DMA_PriCtrlStr;
 	DMA_ChannelInitTypeDef DMA_InitStr;
@@ -416,7 +416,7 @@ void DMA_RX_start(uint8_t* buf, uint32_t buf_size)
 		for (idx = 0; idx < buf_size; idx++)
 		{
 			if (buf[idx] == 13)  // enter
-				return;
+				return idx;
 		}
 	}
 	

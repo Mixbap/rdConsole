@@ -55,7 +55,7 @@ void TIMER_CAPTURE_ini(void);
 void UART1_DMA_ini(void);
 void DMA_ini(void);
 void DMA_TX_start(uint8_t* buf, uint32_t buf_size);
-void DMA_RX_start(uint8_t* buf, uint32_t buf_size);
+uint8_t DMA_RX_start(uint8_t* buf, uint32_t buf_size);
 
 void PortB_EXT_ini(void);
 

@@ -50,6 +50,15 @@ void runConsole(void)
 			DMA_TX_start(exit, sizeof(exit));
 			act = 0;
 			break;	
+		
+		case 14:
+			DMA_TX_start(param, sizeof(param));
+			break;
+		
+		case 12:
+			DMA_TX_start(param, sizeof(param));
+			break;
+		
 		default:
 			DMA_TX_start(unsupCommand, sizeof(unsupCommand));
 			break;
@@ -93,10 +102,18 @@ void printMenu(void)
 uint8_t readData(void)
 {
 	uint8_t data[20] = {0};
-	DMA_RX_start(data, sizeof(data));
-
+	uint8_t idx = 0;
+	uint8_t res = 0;
+	//uint8_t i = 0;
+	idx = DMA_RX_start(data, sizeof(data));
 	DMA_TX_start(transferLine, sizeof(transferLine));
-	return interpret(data[0]);
+	
+	res = dataInterpret(data, idx);
+
+	if (res > 10)
+		LED0_ON;
+	
+	return res;//interpret(data[0]);
 }
 //--------------------------------------------------------------
 // Интерпретатор ASCII цифр
@@ -119,7 +136,29 @@ uint8_t interpret(uint8_t value)
 	}
 }
 
+//--------------------------------------------------------------
+// Интерпретатор входных данных
+//--------------------------------------------------------------
+uint8_t dataInterpret(uint8_t* data, uint8_t idx)
+{
+	uint8_t i = 0;
+	uint8_t result = 0;
+	uint8_t d[20];
+	
+	// Интрепретация массива данных по ASCII
+	for (i = 0; i < idx; i++)
+	{
+		d[i] = interpret(data[i]);
+	}
 
+	// Интерпретация целой части
+	for (i = 0; i < idx; i++)
+	{
+		result = result + (d[i] * (uint8_t)pow(10, idx - 1 - i));
+	}
+
+	return result;
+}
 
 
 
