@@ -21,7 +21,7 @@ void runConsole(void)
 	while (act)
 	{
 		printMenu();
-
+		
 		// Обработчик команд меню 
 		switch (readData())
 		{

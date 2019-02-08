@@ -63,4 +63,19 @@ extern DMA_CtrlDataInitTypeDef DMA_InitStructure;
 extern DMA_ChannelInitTypeDef DMA_Channel_InitStructure;
 
 
+// Структура конфигурации блока
+typedef struct
+{
+	uint8_t typeMod;
+	uint32_t freqMod;
+	uint32_t bufMode;
+	uint32_t amplMod;
+	uint32_t freqBw0;
+	uint32_t freqBw1;
+	uint32_t limitAcc;
+	uint32_t coefAdj;
+}rdParam;
+
+extern rdParam param;
+
 #endif

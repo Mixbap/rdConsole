@@ -4,14 +4,12 @@
 #include "math.h"
 #include "ini.h"
 
-uint8_t buf0[20];
-uint8_t buf1[20] = "DMA1\r\n";
-uint8_t buf2[20] = "DMA2\r\n";
-
 uint8_t transferLine[] = "\r\n";
 uint8_t cursor[] = "\n>> ";
 
 extern uint8_t flagConsole;
+
+extern rdParam param;
 
 void runConsole(void);
 void printMenu(void);
