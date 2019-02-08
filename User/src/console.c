@@ -5,7 +5,6 @@
 void runConsole(void)
 {
 	uint8_t act = 1;
-	uint8_t mode[] = "Type of the modulating voltage:\r\n1. Sinus\r\n2. Saw\r\n3. Triangle\r\n";
 	uint8_t freq[] = "Enter frequency (kHz):\r\n";
 	uint8_t modeBuf[] = "Enter the buffer size:\r\n";
 	uint8_t modeAmp[] = "Enter amplitude:\r\n";
@@ -26,7 +25,6 @@ void runConsole(void)
 		switch (readData())
 		{
 		case 1:
-			DMA_TX_start(mode, sizeof(mode));
 			typeModHandler();
 			break;
 		case 2:
@@ -163,13 +161,15 @@ uint8_t dataInterpret(uint8_t* data, uint8_t idx)
 void typeModHandler(void)
 {
 	uint8_t result;
-	uint8_t unsupCommand[] = "Unsupported command!\r\n";
+	uint8_t mode[] = "Type of the modulating voltage:\r\n1. Sinus\r\n2. Saw\r\n3. Triangle\r\n";
+	uint8_t unsupCommand[] = "Unsupported command!\r\n\n";
 	
 	while (1)
 	{
+		DMA_TX_start(mode, sizeof(mode));
 		DMA_TX_start(cursor, sizeof(cursor));
 		result = readData();
-		if (result > 3)
+		if ((result > 3) | (result < 1))
 		{
 			DMA_TX_start(unsupCommand, sizeof(unsupCommand));
 		}
