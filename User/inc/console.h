@@ -21,6 +21,7 @@ uint32_t dataInterpret(uint8_t* data, uint8_t idx);
 void typeModHandler(void);
 void freqModHandler(void);
 void bufModeHandler(void);
+void amplModHandler(void);
 
 #endif
 

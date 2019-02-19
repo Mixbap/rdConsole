@@ -5,7 +5,6 @@
 void runConsole(void)
 {
 	uint8_t act = 1;
-	uint8_t modeAmp[] = "Enter amplitude:\r\n";
 	uint8_t freqBw[] = "Set bandwidth:\r\n";
 	uint8_t limit[] = "Enter limit accumulation:\r\n";
 	uint8_t param[] = "Enter adjustment coefficient:\r\n";
@@ -31,7 +30,7 @@ void runConsole(void)
 			bufModeHandler();
 			break;
 		case 4:
-			DMA_TX_start(modeAmp, sizeof(modeAmp));
+			amplModHandler();
 			break;
 		case 5:
 			DMA_TX_start(freqBw, sizeof(freqBw));
@@ -137,7 +136,7 @@ uint32_t dataInterpret(uint8_t* data, uint8_t idx)
 	// Интерпретация целой части
 	for (i = 0; i < idx; i++)
 	{
-		result = result + (data[i] * (uint8_t)pow(10, idx - 1 - i));
+		result = result + (data[i] * (uint32_t)pow(10, idx - 1 - i));
 	}
 
 	return result;
@@ -148,7 +147,7 @@ uint32_t dataInterpret(uint8_t* data, uint8_t idx)
 //--------------------------------------------------------------
 void typeModHandler(void)
 {
-	uint8_t result;
+	uint32_t result;
 	uint8_t mode[] = "Type of the modulating voltage:\r\n1. Sinus\r\n2. Saw\r\n3. Triangle\r\n";
 	
 	while (1)
@@ -217,6 +216,43 @@ void bufModeHandler(void)
 		}
 	}
 }
+
+//--------------------------------------------------------------
+// Задание амплитуды модулирующего напряжения
+//--------------------------------------------------------------
+void amplModHandler(void)
+{
+	uint32_t result;
+	uint8_t modeAmp[] = "Enter amplitude:\r\n";
+	
+	while (1)
+	{
+		DMA_TX_start(modeAmp, sizeof(modeAmp));
+		DMA_TX_start(cursor, sizeof(cursor));
+		result = readData();
+		if (param.typeMod == 1)
+		{
+			if (result > 2047)
+				DMA_TX_start(unsupCommand, sizeof(unsupCommand));
+			else 
+			{
+				param.amplMod = result;
+				return;
+			}
+		}
+		else
+		{
+			if (result > 4095)
+				DMA_TX_start(unsupCommand, sizeof(unsupCommand));
+			else 
+			{
+				param.amplMod = result;
+				return;
+			}
+		}
+	}
+}
+
 
 
 
