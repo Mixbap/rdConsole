@@ -22,6 +22,7 @@ void typeModHandler(void);
 void freqModHandler(void);
 void bufModeHandler(void);
 void amplModHandler(void);
+void freqBwHandler(void);
 
 #endif
 

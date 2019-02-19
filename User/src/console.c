@@ -5,7 +5,6 @@
 void runConsole(void)
 {
 	uint8_t act = 1;
-	uint8_t freqBw[] = "Set bandwidth:\r\n";
 	uint8_t limit[] = "Enter limit accumulation:\r\n";
 	uint8_t param[] = "Enter adjustment coefficient:\r\n";
 	uint8_t exit[] = "Exit terminal succesfull!\r\n";
@@ -33,7 +32,7 @@ void runConsole(void)
 			amplModHandler();
 			break;
 		case 5:
-			DMA_TX_start(freqBw, sizeof(freqBw));
+			freqBwHandler();
 			break;
 		case 6:
 			DMA_TX_start(limit, sizeof(limit));
@@ -252,6 +251,41 @@ void amplModHandler(void)
 		}
 	}
 }
+
+//--------------------------------------------------------------
+// «адание полосы пропускани€ частоты биений
+//--------------------------------------------------------------
+void freqBwHandler(void)
+{
+	uint8_t freqBw0[] = "Set lower bound:\r\n";
+	uint8_t freqBw1[] = "Set upper bound:\r\n";
+	uint8_t error[] = "Incorrect input!\r\n\n";
+	
+	while (1)
+	{
+		DMA_TX_start(freqBw0, sizeof(freqBw0));
+		DMA_TX_start(cursor, sizeof(cursor));
+		param.freqBw0 = readData();
+		
+		DMA_TX_start(freqBw1, sizeof(freqBw1));
+		DMA_TX_start(cursor, sizeof(cursor));
+		param.freqBw1 = readData();
+
+		if (param.freqBw0 >= param.freqBw1)
+		{
+			DMA_TX_start(error, sizeof(error));
+		}
+		else if ((param.freqBw0 > 255) || (param.freqBw1 > 255))
+		{
+			DMA_TX_start(unsupCommand, sizeof(unsupCommand));
+		}
+		else
+			return;
+	}
+}
+
+
+
 
 
 
