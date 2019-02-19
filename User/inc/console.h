@@ -23,8 +23,6 @@ void freqModHandler(void);
 void bufModeHandler(void);
 void amplModHandler(void);
 void freqBwHandler(void);
-void limitAccHandler(void);
-void coefAdjHandler(void);
 
 #endif
 

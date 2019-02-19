@@ -5,6 +5,8 @@
 void runConsole(void)
 {
 	uint8_t act = 1;
+	uint8_t limit[] = "Enter limit accumulation:\r\n";
+	uint8_t param[] = "Enter adjustment coefficient:\r\n";
 	uint8_t exit[] = "Exit terminal succesfull!\r\n";
 	
 	DMA_ini(); 							// Инициализация DMA
@@ -33,10 +35,10 @@ void runConsole(void)
 			freqBwHandler();
 			break;
 		case 6:
-			limitAccHandler();
+			DMA_TX_start(limit, sizeof(limit));
 			break;
 		case 7:
-			coefAdjHandler();
+			DMA_TX_start(param, sizeof(param));
 			break;
 		case 8:
 			DMA_TX_start(exit, sizeof(exit));
@@ -281,49 +283,6 @@ void freqBwHandler(void)
 			return;
 	}
 }
-
-//--------------------------------------------------------------
-// Задание порога накопления
-//--------------------------------------------------------------
-void limitAccHandler(void)
-{
-	uint8_t limit[] = "Enter limit accumulation:\r\n";
-	
-	while (1)
-	{
-		DMA_TX_start(limit, sizeof(limit));
-		DMA_TX_start(cursor, sizeof(cursor));
-		param.limitAcc = readData();
-		return;
-	}
-}
-
-//--------------------------------------------------------------
-// Задание коэффициента корректировки
-//--------------------------------------------------------------
-void coefAdjHandler(void)
-{
-	uint32_t result;
-	uint8_t paramAdj[] = "Enter adjustment coefficient:\r\n";
-	
-	while (1)
-	{
-		DMA_TX_start(paramAdj, sizeof(paramAdj));
-		DMA_TX_start(cursor, sizeof(cursor));
-		result = readData();
-		
-		if (result > 100)
-		{
-			DMA_TX_start(unsupCommand, sizeof(unsupCommand));
-		}
-		else
-		{
-			param.coefAdj = result;
-			return;
-		}
-	}
-}
-
 
 
 
