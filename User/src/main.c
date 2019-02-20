@@ -57,7 +57,7 @@ void checkLimits(void)
 		if (n>0)
 			n--;
 	}
-		
+
 	// Индикация попадания в пороги
 	if (RD > param.freqBw0)
 		LED0_ON;
@@ -72,6 +72,7 @@ void checkLimits(void)
 		LED2_OFF;
 		n = 0;
 	}
+
 }
 
 

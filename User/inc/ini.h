@@ -23,14 +23,6 @@
 #define LED3_OFF	PORT_ResetBits(MDR_PORTB, PORT_Pin_3)
 //------------------------------------------------------------
 
-#define MODULATOR_BUFF 32
-#define MODULATOR_FREQ 100000
-#define MODULATOR_PERIOD(F)  ((uint16_t)((uint32_t)(80000000) / (uint32_t)(F * MODULATOR_BUFF)) - 1)
-#define MODULATOR_AMPLITUDE 2047
-#define MODULATOR_AMPLITUDE_PILA 4095
-#define MODULATOR_AMPLITUDE_TRIANGLE 4095
-#define MODULATOR_CONST 2047
-
 #define RD_PORT	    MDR_PORTC					
 #define RD_Pin		  PORT_Pin_2        
 #define RD_TIMER	MDR_TIMER3 				

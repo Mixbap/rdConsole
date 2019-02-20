@@ -4,9 +4,11 @@
 DMA_CtrlDataInitTypeDef DMA_InitStructure;
 DMA_ChannelInitTypeDef DMA_Channel_InitStructure;
 
-uint16_t sin_mod[MODULATOR_BUFF] = {0};
-uint16_t triangle_mod[MODULATOR_BUFF] = {0};
-uint16_t pila_mod[MODULATOR_BUFF] = {0};
+//uint16_t sin_mod[256] = {0};
+//uint16_t triangle_mod[256] = {0};
+//uint16_t pila_mod[256] = {0};
+
+uint16_t modArr[256] = {0};
 
 /*
 // Отчеты синуса
@@ -113,11 +115,11 @@ void Sin_massiv(void)
 	uint32_t i;
 	float w;
 	
-  w = 2 * 3.1415926535 / MODULATOR_BUFF; 
+  w = 2 * 3.1415926535 / param.bufMode; 
 	
-	for (i = 0; i < MODULATOR_BUFF; i++)
+	for (i = 0; i < param.bufMode; i++)
 	{
-     sin_mod[i] = MODULATOR_CONST + MODULATOR_AMPLITUDE * sin(w * i);
+     modArr[i] = param.constMode + param.amplMod * sin(w * i);
   }
 }
 //------------------------------------------------------------
@@ -128,13 +130,13 @@ void Pila_massiv(void)
 	uint32_t i;
 	float k;
 	
-	k = (float)(MODULATOR_AMPLITUDE_PILA) / MODULATOR_BUFF;
+	k = (float)(param.amplMod) / param.bufMode;
 	
-	for (i = 0; i < MODULATOR_BUFF-1; i++)
+	for (i = 0; i < param.bufMode-1; i++)
 	{
-		pila_mod[i] = k * i;
+		modArr[i] = k * i;
 	}
-	pila_mod[MODULATOR_BUFF-1] = pila_mod[0];
+	modArr[param.bufMode-1] = modArr[0];
 }
 
 //------------------------------------------------------------
@@ -145,15 +147,15 @@ void Triangle_massiv(void)
 	uint32_t i;
 	float k;
 	
-	k = (float)(MODULATOR_AMPLITUDE_TRIANGLE * 2) / MODULATOR_BUFF;
+	k = (float)(param.amplMod * 2) / param.bufMode;
 	
-	for (i = 0; i < MODULATOR_BUFF/2; i++)
+	for (i = 0; i < param.bufMode/2; i++)
 	{
-		triangle_mod[i] = k * i;
+		modArr[i] = k * i;
 	}
-		for (i = MODULATOR_BUFF/2; i < MODULATOR_BUFF; i++)
+		for (i = param.bufMode/2; i < param.bufMode; i++)
 	{
-		triangle_mod[i] = k * (MODULATOR_BUFF-i);
+		modArr[i] = k * (param.bufMode-i);
 	}
 }
 
@@ -170,9 +172,9 @@ void DMA_DAC2_ini(void)
 	DMA_DeInit();
   DMA_StructInit (&DMA_Channel_InitStructure);
 	
-	DMA_InitStructure.DMA_SourceBaseAddr = (uint32_t) sin_mod;	              
+	DMA_InitStructure.DMA_SourceBaseAddr = (uint32_t) modArr;	              
   DMA_InitStructure.DMA_DestBaseAddr = (uint32_t)(&(MDR_DAC->DAC2_DATA));	
-  DMA_InitStructure.DMA_CycleSize = MODULATOR_BUFF;							
+  DMA_InitStructure.DMA_CycleSize = param.bufMode;							
   DMA_InitStructure.DMA_SourceIncSize = DMA_SourceIncHalfword;				    
   DMA_InitStructure.DMA_DestIncSize = DMA_DestIncNo;				              
   DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;     
@@ -202,6 +204,9 @@ void TIMER1_ini(void)
 {
 	TIMER_CntInitTypeDef TIM_CntInit;	
 	
+	uint32_t periodMod;
+	periodMod = ((uint16_t)((uint32_t)(80000000) / (uint32_t)(param.freqMod * param.bufMode)) - 1);
+	
   TIMER_DeInit (MDR_TIMER1);
 
   RST_CLK_PCLKcmd (RST_CLK_PCLK_TIMER1, ENABLE);  
@@ -209,7 +214,7 @@ void TIMER1_ini(void)
   TIMER_BRGInit (MDR_TIMER1, TIMER_HCLKdiv1);
 	
   TIM_CntInit.TIMER_Prescaler                = 0;                                  
-  TIM_CntInit.TIMER_Period                   = MODULATOR_PERIOD (MODULATOR_FREQ); 
+  TIM_CntInit.TIMER_Period                   = periodMod; 
   TIM_CntInit.TIMER_CounterMode              = TIMER_CntMode_ClkFixedDir;          
   TIM_CntInit.TIMER_CounterDirection         = TIMER_CntDir_Up;                     
   TIM_CntInit.TIMER_EventSource              = TIMER_EvSrc_None;                    
@@ -232,10 +237,19 @@ void TIMER1_ini(void)
 //------------------------------------------------------------
 void Modulator_ini(void)
 {
-	Sin_massiv();
-	Pila_massiv();
-	Triangle_massiv();
-	
+	switch (param.typeMod)
+	{
+		case 1:
+			Sin_massiv();
+			break;
+		case 2:
+			Pila_massiv();
+			break;
+		case 3:
+			Triangle_massiv();
+			break;
+	}
+
 	DMA_DAC2_ini();
 	
 	DAC2_PortE_ini();
