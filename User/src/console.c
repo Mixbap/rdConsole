@@ -30,15 +30,18 @@ void runConsole(void)
 			amplModHandler();
 			break;
 		case 5:
-			freqBwHandler();
+			constModeHandler();
 			break;
 		case 6:
-			limitAccHandler();
+			freqBwHandler();
 			break;
 		case 7:
-			coefAdjHandler();
+			limitAccHandler();
 			break;
 		case 8:
+			coefAdjHandler();
+			break;
+		case 9:
 			DMA_TX_start(exit, sizeof(exit));
 			act = 0;
 			break;		
@@ -63,16 +66,18 @@ void printMenu(void)
 	uint8_t freq[] = "[2] Frequency of the modulating voltage\r\n";
 	uint8_t modeBuf[] = "[3] Size of the buffer of counting\r\n";
 	uint8_t modeAmp[] = "[4] Maximum amplitude of the modulating voltage\r\n";
-	uint8_t freqBw[] = "[5] Bandwidth of frequency of beats\r\n";
-	uint8_t limit[] = "[6] Limit accumulation\r\n";
-	uint8_t param[] = "[7] Adjustment coefficient\r\n";
-	uint8_t exit[] = "[8] Exit terminal\r\n";
+	uint8_t constMode[] = "[5] Constant of the modulating voltage\r\n";
+	uint8_t freqBw[] = "[6] Bandwidth of frequency of beats\r\n";
+	uint8_t limit[] = "[7] Limit accumulation\r\n";
+	uint8_t param[] = "[8] Adjustment coefficient\r\n";
+	uint8_t exit[] = "[9] Exit terminal\r\n";
 	
 	DMA_TX_start(hello, sizeof(hello));
 	DMA_TX_start(mode, sizeof(mode));
 	DMA_TX_start(freq, sizeof(freq));
 	DMA_TX_start(modeBuf, sizeof(modeBuf));
 	DMA_TX_start(modeAmp, sizeof(modeAmp));
+	DMA_TX_start(constMode, sizeof(constMode));
 	DMA_TX_start(freqBw, sizeof(freqBw));
 	DMA_TX_start(limit, sizeof(limit));
 	DMA_TX_start(param, sizeof(param));
@@ -287,6 +292,38 @@ void amplModHandler(void)
 }
 
 //--------------------------------------------------------------
+// Задание постоянной состовляющей модулирующего напряжения
+//--------------------------------------------------------------
+void constModeHandler(void)
+{
+	uint32_t result;
+	uint8_t constMode[] = "Enter constant:\r\n";
+	
+	while (1)
+	{
+		DMA_TX_start(constMode, sizeof(constMode));
+		DMA_TX_start(cursor, sizeof(cursor));
+		result = readData();
+		
+		// Обработка ошибки
+		if (error < 0)
+		{
+			errorHandler();
+		}
+		else if (result > 4095)
+		{
+			error = constModeError;
+			errorHandler();
+		}
+		else
+		{
+			param.constMode = result;
+			return;
+		}
+	}
+}
+
+//--------------------------------------------------------------
 // Задание полосы пропускания частоты биений
 //--------------------------------------------------------------
 void freqBwHandler(void)
@@ -394,6 +431,7 @@ void errorHandler(void)
 	uint8_t amplModErrorArr[] = "error amplModError: Incorrect amplitude(sinus - less 2048, other - less 4096)\r\n\n";
 	uint8_t freqBwErrorArr[] = "error freqBwError: Incorrect bandwidth\r\n\n";
 	uint8_t coefAdjErrorArr[] = "error coefAdjError: Incorrect coefficient(values in the range 0-100)\r\n\n";
+	uint8_t constModeErrorArr[] = "error constModeError: Incorrect constant(values less 4096)\r\n\n";
 	
 	switch (error)
 	{
@@ -417,6 +455,9 @@ void errorHandler(void)
 			break;
 		case coefAdjError:
 			DMA_TX_start(coefAdjErrorArr, sizeof(coefAdjErrorArr));
+			break;
+		case constModeError:
+			DMA_TX_start(constModeErrorArr, sizeof(constModeErrorArr));
 			break;
 	}
 	

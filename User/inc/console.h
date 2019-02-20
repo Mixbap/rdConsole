@@ -22,6 +22,7 @@ enum typeError
 	amplModError = -5, // Неверный ввод амплитуды модулирующего напряжения
 	freqBwError = -6, // Неверный ввод полосы пропускания
 	coefAdjError = -7, // Неверный ввод коэффициента корректировки
+	constModeError = -8, // Неверный ввод постоянной состовляющей модулирующего напряжения
 };
 
 void runConsole(void);
@@ -37,6 +38,7 @@ void amplModHandler(void);
 void freqBwHandler(void);
 void limitAccHandler(void);
 void coefAdjHandler(void);
+void constModeHandler(void);
 
 void errorHandler(void);
 

@@ -3,6 +3,7 @@
 
 int main(void)
 {
+	rdParamDefIni();		// Инициализация параметров блока по умолчанию
 	CLK_80_ini(); 			// Инициализация CLK = 80 MHz от HSE
 	LED_PortB_ini();		// Инициализация LED (PB0, PB1, PB2, PB3)
 	PortB_EXT_ini();		// Инициализация внешнего прерывания по PB10 (XS9 23 pin)

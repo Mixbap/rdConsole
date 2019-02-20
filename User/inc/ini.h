@@ -59,6 +59,8 @@ uint8_t DMA_RX_start(uint8_t* buf, uint32_t buf_size);
 
 void PortB_EXT_ini(void);
 
+void rdParamDefIni(void);
+
 extern DMA_CtrlDataInitTypeDef DMA_InitStructure;
 extern DMA_ChannelInitTypeDef DMA_Channel_InitStructure;
 
@@ -74,6 +76,7 @@ typedef struct
 	uint32_t freqBw1;
 	uint32_t limitAcc;
 	uint32_t coefAdj;
+	uint32_t constMode;
 }rdParam;
 
 extern rdParam param;
