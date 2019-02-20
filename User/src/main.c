@@ -42,9 +42,9 @@ void checkLimits(void)
 	}
 	
 	// Проверка попадания в пороги
-	if (RD > POROG_MIN)
+	if (RD > param.freqBw0)
 	{
-		if (RD < POROG_MAX)
+		if (RD < param.freqBw1)
 			n++;
 		else
 		{
@@ -59,14 +59,14 @@ void checkLimits(void)
 	}
 		
 	// Индикация попадания в пороги
-	if (RD > POROG_MIN)
+	if (RD > param.freqBw0)
 		LED0_ON;
 			
-	if (RD < POROG_MAX)
+	if (RD < param.freqBw1)
 		LED1_ON;
 	
 	// Проверка и индикация порога накопления
-	if (n == POROG_NAKOPLENIE)
+	if (n == param.limitAcc)
 	{
 		LED3_ON;
 		LED2_OFF;

@@ -36,10 +36,6 @@
 #define RD_TIMER	MDR_TIMER3 				
 #define RD_CHN	  TIMER_CHANNEL1
 
-#define POROG_NAKOPLENIE  10
-#define POROG_MAX 105
-#define POROG_MIN 95
-
 void DAC2_PortE_ini(void);
 void LED_PortB_ini(void);
 void CLK_80_ini(void);
