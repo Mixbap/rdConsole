@@ -218,7 +218,7 @@ void typeModHandler(void)
 	uint8_t size;
 	uint8_t data[5] = {0};
 	uint8_t mode[] = "Type of the modulating voltage:\r\n[1] Sinus\r\n[2] Saw\r\n[3] Triangle\r\n";
-	uint8_t modePrint[] = "Type of the modulating voltage:              ";
+	uint8_t modePrint[] = "Type of the modulating voltage: ";
 	
 	while (1)
 	{
@@ -258,8 +258,8 @@ void freqModHandler(void)
 	uint32_t result;
 	uint8_t size;
 	uint8_t data[5] = {0};
-	uint8_t freq[] = "Enter frequency (kHz):\r\n";
-	uint8_t freqPrint[] = "Frequency of the modulating voltage:         ";
+	uint8_t freq[] = "Enter frequency (Hz):\r\n";
+	uint8_t freqPrint[] = "Frequency of the modulating voltage: ";
 	
 	while (1)
 	{
@@ -300,7 +300,7 @@ void bufModeHandler(void)
 	uint8_t size;
 	uint8_t data[5] = {0};
 	uint8_t modeBuf[] = "Enter the buffer size:\r\n";
-	uint8_t modeBufPrint[] = "Size of the buffer of counting:              ";
+	uint8_t modeBufPrint[] = "Size of the buffer of counting: ";
 	
 	while (1)
 	{
@@ -404,7 +404,7 @@ void constModeHandler(void)
 	uint8_t size;
 	uint8_t data[5] = {0};
 	uint8_t constMode[] = "Enter constant:\r\n";
-	uint8_t constModePrint[] = "Constant of the modulating voltage:          ";
+	uint8_t constModePrint[] = "Constant of the modulating voltage: ";
 	
 	while (1)
 	{
@@ -446,7 +446,7 @@ void freqBwHandler(void)
 	uint8_t data[5] = {0};
 	uint8_t freqBw0[] = "Set lower bound:\r\n";
 	uint8_t freqBw1[] = "Set upper bound:\r\n";
-	uint8_t freqBw[] = "Bandwidth of frequency of beats:             [";
+	uint8_t freqBw[] = "Bandwidth of frequency of beats: [";
 	uint8_t freqBwPoint[] = ",";
 	uint8_t freqBwScob[] = "]";
 	
@@ -502,7 +502,7 @@ void limitAccHandler(void)
 	uint8_t size;
 	uint8_t data[5] = {0};
 	uint8_t limit[] = "Enter limit accumulation:\r\n";
-	uint8_t limitPrint[] = "Limit accumulation:                          ";
+	uint8_t limitPrint[] = "Limit accumulation: ";
 	
 	while (1)
 	{
@@ -532,7 +532,7 @@ void coefAdjHandler(void)
 	uint8_t size;
 	uint8_t data[5] = {0};
 	uint8_t paramAdj[] = "Enter adjustment coefficient:\r\n";
-	uint8_t coefPrint[] = "Adjustment coefficient:                      ";
+	uint8_t coefPrint[] = "Adjustment coefficient: ";
 	
 	while (1)
 	{

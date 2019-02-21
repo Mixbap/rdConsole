@@ -13,6 +13,12 @@ uint8_t flagConsole = 0;
 
 rdParam param;
 
+#define DISTANCE_VALUE 10
+uint16_t distanceArr[DISTANCE_VALUE];
+uint8_t indDistance = 0;
+int distance = 0;
+
 void checkLimits(void);
+void distanceMode(void);
 
 #endif

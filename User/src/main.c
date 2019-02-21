@@ -22,12 +22,13 @@ int main(void)
 			NVIC_EnableIRQ(EXT_INT2_IRQn); 	// Разрешение внешних прерываний по PB10 (XS9 23 pin) 
 		}
 		
-		checkLimits(); // Проверка попадания в пороги
+		//checkLimits(); // Проверка попадания в пороги (выдача ИК)
+		distanceMode();  // Режим измерения дальности
 	}
 }
 
 //------------------------------------------------------------
-// Проверка попадания в пороги
+// Проверка попадания в пороги (выдача ИК)
 //------------------------------------------------------------
 void checkLimits(void)
 {
@@ -74,5 +75,51 @@ void checkLimits(void)
 	}
 
 }
+
+//------------------------------------------------------------
+// Режим измерения дальности
+//------------------------------------------------------------
+void distanceMode(void)
+{
+	uint32_t i;
+	uint32_t result = 0;
+	// Проверка выхода из прерывания
+	if (Flag_IRQ == 1)
+	{
+		RD = RD_TIMER->CNT;
+		RD_TIMER->CNT = 0;
+		Flag_IRQ = 0;
+
+		// Заполнение окна
+		distanceArr[indDistance] = RD;
+		indDistance++;
+		if (indDistance == DISTANCE_VALUE)
+			indDistance = 0;
+		
+		// Вычисление дальности
+		for (i = 0; i < DISTANCE_VALUE; i++)
+		{
+			result = result + distanceArr[i]; 
+		}
+		distance = (int)(result/DISTANCE_VALUE);
+	}	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
