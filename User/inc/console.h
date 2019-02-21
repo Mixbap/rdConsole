@@ -29,7 +29,9 @@ void runConsole(void);
 void printMenu(void);
 uint32_t readData(void);
 uint8_t interpret(uint8_t value);
+uint8_t deinterpret(uint8_t value);
 uint32_t dataInterpret(uint8_t* data, uint8_t idx);
+void dataDeinterpret(uint8_t* data, uint32_t value);
 
 void typeModHandler(void);
 void freqModHandler(void);
@@ -39,6 +41,8 @@ void freqBwHandler(void);
 void limitAccHandler(void);
 void coefAdjHandler(void);
 void constModeHandler(void);
+
+void getDefConfig(void);
 
 void errorHandler(void);
 

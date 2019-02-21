@@ -5,6 +5,7 @@
 void runConsole(void)
 {
 	uint8_t act = 1;
+	uint8_t defConf[] = "Set default configuraton succesfull!\r\n";
 	uint8_t exit[] = "Exit terminal succesfull!\r\n";
 	
 	DMA_ini(); 							// Инициализация DMA
@@ -42,6 +43,13 @@ void runConsole(void)
 			coefAdjHandler();
 			break;
 		case 9:
+			rdParamDefIni();
+			DMA_TX_start(defConf, sizeof(defConf));
+			break;	
+		case 10:
+			getDefConfig();
+			break;	
+		case 11:
 			DMA_TX_start(exit, sizeof(exit));
 			act = 0;
 			break;		
@@ -70,7 +78,9 @@ void printMenu(void)
 	uint8_t freqBw[] = "[6] Bandwidth of frequency of beats\r\n";
 	uint8_t limit[] = "[7] Limit accumulation\r\n";
 	uint8_t param[] = "[8] Adjustment coefficient\r\n";
-	uint8_t exit[] = "[9] Exit terminal\r\n";
+	uint8_t defConf[] = "[9] Set default configuration\r\n";
+	uint8_t getDefConf[] = "[10] Get default configuration\r\n";
+	uint8_t exit[] = "[11] Exit terminal\r\n";
 	
 	DMA_TX_start(hello, sizeof(hello));
 	DMA_TX_start(mode, sizeof(mode));
@@ -81,6 +91,8 @@ void printMenu(void)
 	DMA_TX_start(freqBw, sizeof(freqBw));
 	DMA_TX_start(limit, sizeof(limit));
 	DMA_TX_start(param, sizeof(param));
+	DMA_TX_start(defConf, sizeof(defConf));
+	DMA_TX_start(getDefConf, sizeof(getDefConf));
 	DMA_TX_start(exit, sizeof(exit));
 	DMA_TX_start(cursor, sizeof(cursor));
 }
@@ -122,6 +134,56 @@ uint8_t interpret(uint8_t value)
 			error = incorInp; // Некорректный ввод данных
 			return value;
 	}
+}
+
+//--------------------------------------------------------------
+// Деинтерпретатор ASCII цифр
+//--------------------------------------------------------------
+uint8_t deinterpret(uint8_t value)
+{
+	switch (value)
+	{
+		case 0: return 0x30;
+		case 1: return 0x31;
+		case 2: return 0x32;
+		case 3: return 0x33;
+		case 4: return 0x34;
+		case 5: return 0x35;
+		case 6: return 0x36;
+		case 7: return 0x37;
+		case 8: return 0x38;
+		case 9: return 0x39;
+		default:
+			return value;
+	}
+}
+
+//--------------------------------------------------------------
+// Деинтерпретатор данных
+//--------------------------------------------------------------
+void dataDeinterpret(uint8_t* data, uint32_t value)
+{
+	uint8_t idx = 0, i = 0;
+	int ceil;
+	
+	// Размер данных
+	while (!idx)
+	{
+		ceil = (int)(value/pow(10, i));
+		if (ceil == 0)
+			idx = i;
+		
+		i++;
+	}
+	
+	// Получение массива данных
+	for (i = 0; i < idx; i++)
+	{
+		ceil = (int)(value/pow(10, idx-1-i));
+		data[i] = deinterpret((uint8_t)ceil);
+		value = value - ((uint32_t)ceil*(uint32_t)pow(10, idx-1-i));
+	}
+	
 }
 
 //--------------------------------------------------------------
@@ -417,6 +479,16 @@ void coefAdjHandler(void)
 			return;
 		}
 	}
+}
+
+//--------------------------------------------------------------
+// Вывод параметров по умолчанию
+//--------------------------------------------------------------
+void getDefConfig(void)
+{
+	uint8_t data[5] = {0};
+	dataDeinterpret(data, param.amplMod);
+	DMA_TX_start(data, sizeof(data));
 }
 
 //--------------------------------------------------------------
