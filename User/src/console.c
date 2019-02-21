@@ -161,7 +161,7 @@ uint8_t deinterpret(uint8_t value)
 //--------------------------------------------------------------
 // Деинтерпретатор данных
 //--------------------------------------------------------------
-void dataDeinterpret(uint8_t* data, uint32_t value)
+uint8_t dataDeinterpret(uint8_t* data, uint32_t value)
 {
 	uint8_t idx = 0, i = 0;
 	int ceil;
@@ -183,7 +183,7 @@ void dataDeinterpret(uint8_t* data, uint32_t value)
 		data[i] = deinterpret((uint8_t)ceil);
 		value = value - ((uint32_t)ceil*(uint32_t)pow(10, idx-1-i));
 	}
-	
+	return idx;
 }
 
 //--------------------------------------------------------------
@@ -215,7 +215,10 @@ uint32_t dataInterpret(uint8_t* data, uint8_t idx)
 void typeModHandler(void)
 {
 	uint32_t result;
+	uint8_t size;
+	uint8_t data[5] = {0};
 	uint8_t mode[] = "Type of the modulating voltage:\r\n[1] Sinus\r\n[2] Saw\r\n[3] Triangle\r\n";
+	uint8_t modePrint[] = "Type of the modulating voltage:              ";
 	
 	while (1)
 	{
@@ -236,6 +239,12 @@ void typeModHandler(void)
 		else 
 		{
 			param.typeMod = result;
+			
+			// Вывод typeMod
+			DMA_TX_start(modePrint, sizeof(modePrint));
+			size = dataDeinterpret(data, (uint32_t)param.typeMod);
+			DMA_TX_start(data, size);
+			DMA_TX_start(transferLine, sizeof(transferLine));
 			return;
 		}
 	}
@@ -487,8 +496,71 @@ void coefAdjHandler(void)
 void getDefConfig(void)
 {
 	uint8_t data[5] = {0};
-	dataDeinterpret(data, param.amplMod);
-	DMA_TX_start(data, sizeof(data));
+	uint8_t size;
+
+	uint8_t mode[] = "Type of the modulating voltage:              ";
+	uint8_t freq[] = "Frequency of the modulating voltage:         ";
+	uint8_t modeBuf[] = "Size of the buffer of counting:              ";
+	uint8_t modeAmp[] = "Maximum amplitude of the modulating voltage: ";
+	uint8_t constMode[] = "Constant of the modulating voltage:          ";
+	uint8_t freqBw[] = "Bandwidth of frequency of beats:             [";
+	uint8_t freqBwPoint[] = ",";
+	uint8_t freqBwScob[] = "]";
+	uint8_t limit[] = "Limit accumulation:                          ";
+	uint8_t coef[] = "Adjustment coefficient:                      ";
+
+	// Вывод typeMod
+	DMA_TX_start(mode, sizeof(mode));
+	size = dataDeinterpret(data, (uint32_t)param.typeMod);
+	DMA_TX_start(data, size);
+	DMA_TX_start(transferLine, sizeof(transferLine));
+
+	// Вывод freqMod
+	DMA_TX_start(freq, sizeof(freq));
+	size = dataDeinterpret(data, param.freqMod);
+	DMA_TX_start(data, size);
+	DMA_TX_start(transferLine, sizeof(transferLine));
+	
+	// Вывод bufMode
+	DMA_TX_start(modeBuf, sizeof(modeBuf));
+	size = dataDeinterpret(data, param.bufMode);
+	DMA_TX_start(data, size);
+	DMA_TX_start(transferLine, sizeof(transferLine));
+	
+	// Вывод amplMod
+	DMA_TX_start(modeAmp, sizeof(modeAmp));
+	size = dataDeinterpret(data, param.amplMod);
+	DMA_TX_start(data, size);
+	DMA_TX_start(transferLine, sizeof(transferLine));
+	
+	// Вывод constMode
+	DMA_TX_start(constMode, sizeof(constMode));
+	size = dataDeinterpret(data, param.constMode);
+	DMA_TX_start(data, size);
+	DMA_TX_start(transferLine, sizeof(transferLine));
+	
+	// Вывод freqBw
+	DMA_TX_start(freqBw, sizeof(freqBw));
+	size = dataDeinterpret(data, param.freqBw0);
+	DMA_TX_start(data, size);
+	DMA_TX_start(freqBwPoint, sizeof(freqBwPoint));
+	size = dataDeinterpret(data, param.freqBw1);
+	DMA_TX_start(data, size);
+	DMA_TX_start(freqBwScob, sizeof(freqBwScob));
+	DMA_TX_start(transferLine, sizeof(transferLine));
+		
+	// Вывод limitAcc
+	DMA_TX_start(limit, sizeof(limit));	
+	size = dataDeinterpret(data, param.limitAcc);
+	DMA_TX_start(data, size);
+	DMA_TX_start(transferLine, sizeof(transferLine));
+	
+	// Вывод coefAdj
+	DMA_TX_start(coef, sizeof(coef));
+	size = dataDeinterpret(data, param.coefAdj);
+	DMA_TX_start(data, size);
+	DMA_TX_start(transferLine, sizeof(transferLine));
+	
 }
 
 //--------------------------------------------------------------

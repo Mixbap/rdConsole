@@ -31,7 +31,7 @@ uint32_t readData(void);
 uint8_t interpret(uint8_t value);
 uint8_t deinterpret(uint8_t value);
 uint32_t dataInterpret(uint8_t* data, uint8_t idx);
-void dataDeinterpret(uint8_t* data, uint32_t value);
+uint8_t dataDeinterpret(uint8_t* data, uint32_t value);
 
 void typeModHandler(void);
 void freqModHandler(void);
