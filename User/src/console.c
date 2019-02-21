@@ -47,7 +47,7 @@ void runConsole(void)
 			DMA_TX_start(defConf, sizeof(defConf));
 			break;	
 		case 10:
-			getDefConfig();
+			getConfig();
 			break;	
 		case 11:
 			DMA_TX_start(exit, sizeof(exit));
@@ -79,7 +79,7 @@ void printMenu(void)
 	uint8_t limit[] = "[7] Limit accumulation\r\n";
 	uint8_t param[] = "[8] Adjustment coefficient\r\n";
 	uint8_t defConf[] = "[9] Set default configuration\r\n";
-	uint8_t getDefConf[] = "[10] Get default configuration\r\n";
+	uint8_t getConf[] = "[10] Get configuration\r\n";
 	uint8_t exit[] = "[11] Exit terminal\r\n";
 	
 	DMA_TX_start(hello, sizeof(hello));
@@ -92,7 +92,7 @@ void printMenu(void)
 	DMA_TX_start(limit, sizeof(limit));
 	DMA_TX_start(param, sizeof(param));
 	DMA_TX_start(defConf, sizeof(defConf));
-	DMA_TX_start(getDefConf, sizeof(getDefConf));
+	DMA_TX_start(getConf, sizeof(getConf));
 	DMA_TX_start(exit, sizeof(exit));
 	DMA_TX_start(cursor, sizeof(cursor));
 }
@@ -567,7 +567,7 @@ void coefAdjHandler(void)
 //--------------------------------------------------------------
 // Вывод параметров по умолчанию
 //--------------------------------------------------------------
-void getDefConfig(void)
+void getConfig(void)
 {
 	uint8_t data[5] = {0};
 	uint8_t size;

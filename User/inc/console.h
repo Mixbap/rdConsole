@@ -42,7 +42,7 @@ void limitAccHandler(void);
 void coefAdjHandler(void);
 void constModeHandler(void);
 
-void getDefConfig(void);
+void getConfig(void);
 
 void errorHandler(void);
 
