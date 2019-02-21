@@ -256,7 +256,10 @@ void typeModHandler(void)
 void freqModHandler(void)
 {
 	uint32_t result;
+	uint8_t size;
+	uint8_t data[5] = {0};
 	uint8_t freq[] = "Enter frequency (kHz):\r\n";
+	uint8_t freqPrint[] = "Frequency of the modulating voltage:         ";
 	
 	while (1)
 	{
@@ -277,6 +280,12 @@ void freqModHandler(void)
 		else
 		{
 			param.freqMod = result;
+			
+			// Вывод freqMod
+			DMA_TX_start(freqPrint, sizeof(freqPrint));
+			size = dataDeinterpret(data, param.freqMod);
+			DMA_TX_start(data, size);
+			DMA_TX_start(transferLine, sizeof(transferLine));
 			return;
 		}
 	}
@@ -288,7 +297,10 @@ void freqModHandler(void)
 void bufModeHandler(void)
 {
 	uint32_t result;
+	uint8_t size;
+	uint8_t data[5] = {0};
 	uint8_t modeBuf[] = "Enter the buffer size:\r\n";
+	uint8_t modeBufPrint[] = "Size of the buffer of counting:              ";
 	
 	while (1)
 	{
@@ -309,6 +321,12 @@ void bufModeHandler(void)
 		else
 		{
 			param.bufMode = result;
+			
+			// Вывод bufMode
+			DMA_TX_start(modeBufPrint, sizeof(modeBufPrint));
+			size = dataDeinterpret(data, param.bufMode);
+			DMA_TX_start(data, size);
+			DMA_TX_start(transferLine, sizeof(transferLine));
 			return;
 		}
 	}
@@ -320,7 +338,10 @@ void bufModeHandler(void)
 void amplModHandler(void)
 {
 	uint32_t result;
+	uint8_t size;
+	uint8_t data[5] = {0};
 	uint8_t modeAmp[] = "Enter amplitude:\r\n";
+	uint8_t modeAmpPrint[] = "Maximum amplitude of the modulating voltage: ";
 	
 	while (1)
 	{
@@ -343,6 +364,12 @@ void amplModHandler(void)
 			else 
 			{
 				param.amplMod = result;
+				
+				// Вывод amplMod
+				DMA_TX_start(modeAmpPrint, sizeof(modeAmpPrint));
+				size = dataDeinterpret(data, param.amplMod);
+				DMA_TX_start(data, size);
+				DMA_TX_start(transferLine, sizeof(transferLine));
 				return;
 			}
 		}
@@ -356,6 +383,12 @@ void amplModHandler(void)
 			else 
 			{
 				param.amplMod = result;
+				
+				// Вывод amplMod
+				DMA_TX_start(modeAmpPrint, sizeof(modeAmpPrint));
+				size = dataDeinterpret(data, param.amplMod);
+				DMA_TX_start(data, size);
+				DMA_TX_start(transferLine, sizeof(transferLine));
 				return;
 			}
 		}
@@ -368,7 +401,10 @@ void amplModHandler(void)
 void constModeHandler(void)
 {
 	uint32_t result;
+	uint8_t size;
+	uint8_t data[5] = {0};
 	uint8_t constMode[] = "Enter constant:\r\n";
+	uint8_t constModePrint[] = "Constant of the modulating voltage:          ";
 	
 	while (1)
 	{
@@ -389,6 +425,12 @@ void constModeHandler(void)
 		else
 		{
 			param.constMode = result;
+			
+			// Вывод constMode
+			DMA_TX_start(constModePrint, sizeof(constModePrint));
+			size = dataDeinterpret(data, param.constMode);
+			DMA_TX_start(data, size);
+			DMA_TX_start(transferLine, sizeof(transferLine));
 			return;
 		}
 	}
@@ -400,8 +442,13 @@ void constModeHandler(void)
 void freqBwHandler(void)
 {
 	uint32_t result0, result1;
+	uint8_t size;
+	uint8_t data[5] = {0};
 	uint8_t freqBw0[] = "Set lower bound:\r\n";
 	uint8_t freqBw1[] = "Set upper bound:\r\n";
+	uint8_t freqBw[] = "Bandwidth of frequency of beats:             [";
+	uint8_t freqBwPoint[] = ",";
+	uint8_t freqBwScob[] = "]";
 	
 	while (1)
 	{
@@ -432,6 +479,16 @@ void freqBwHandler(void)
 		{
 			param.freqBw0 = result0;
 			param.freqBw1 = result1;
+			
+			// Вывод freqBw
+			DMA_TX_start(freqBw, sizeof(freqBw));
+			size = dataDeinterpret(data, param.freqBw0);
+			DMA_TX_start(data, size);
+			DMA_TX_start(freqBwPoint, sizeof(freqBwPoint));
+			size = dataDeinterpret(data, param.freqBw1);
+			DMA_TX_start(data, size);
+			DMA_TX_start(freqBwScob, sizeof(freqBwScob));
+			DMA_TX_start(transferLine, sizeof(transferLine));
 			return;
 		}
 	}
@@ -442,7 +499,10 @@ void freqBwHandler(void)
 //--------------------------------------------------------------
 void limitAccHandler(void)
 {
+	uint8_t size;
+	uint8_t data[5] = {0};
 	uint8_t limit[] = "Enter limit accumulation:\r\n";
+	uint8_t limitPrint[] = "Limit accumulation:                          ";
 	
 	while (1)
 	{
@@ -454,6 +514,11 @@ void limitAccHandler(void)
 		if (error < 0)
 			errorHandler();
 		
+		// Вывод limitAcc
+		DMA_TX_start(limitPrint, sizeof(limitPrint));	
+		size = dataDeinterpret(data, param.limitAcc);
+		DMA_TX_start(data, size);
+		DMA_TX_start(transferLine, sizeof(transferLine));
 		return;
 	}
 }
@@ -464,7 +529,10 @@ void limitAccHandler(void)
 void coefAdjHandler(void)
 {
 	uint32_t result;
+	uint8_t size;
+	uint8_t data[5] = {0};
 	uint8_t paramAdj[] = "Enter adjustment coefficient:\r\n";
+	uint8_t coefPrint[] = "Adjustment coefficient:                      ";
 	
 	while (1)
 	{
@@ -485,6 +553,12 @@ void coefAdjHandler(void)
 		else
 		{
 			param.coefAdj = result;
+			
+			// Вывод coefAdj
+			DMA_TX_start(coefPrint, sizeof(coefPrint));
+			size = dataDeinterpret(data, param.coefAdj);
+			DMA_TX_start(data, size);
+			DMA_TX_start(transferLine, sizeof(transferLine));
 			return;
 		}
 	}
