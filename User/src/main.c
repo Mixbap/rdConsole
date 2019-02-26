@@ -20,6 +20,7 @@ int main(void)
 			Modulator_ini(); 								// Инициализация модулятора
 			TIMER_CAPTURE_ini(); 						// Инициализация таймера в режиме захвата (PC2 XS9 26 pin)
 			NVIC_EnableIRQ(EXT_INT2_IRQn); 	// Разрешение внешних прерываний по PB10 (XS9 23 pin) 
+			flagConsole = 0;								// Сброс флага выхода из терминала
 		}
 		
 		if (param.mode == 1)
@@ -40,17 +41,14 @@ int main(void)
 //------------------------------------------------------------
 void checkLimits(void)
 {
-	/*
 	// Проверка выхода из прерывания
 	if (Flag_IRQ == 1)
 	{
-		//RD = RD_TIMER->CNT;
-		//RD_TIMER->CNT = 0;
 		Flag_IRQ = 0;
 		LED0_OFF;
 		LED1_OFF;
 	}
-*/
+
 	// Проверка попадания в пороги
 	if (RD > param.freqBw0)
 	{
@@ -94,8 +92,6 @@ void distanceMode(void)
 	// Проверка выхода из прерывания
 	if (Flag_IRQ == 1)
 	{
-		RD = RD_TIMER->CNT;
-		RD_TIMER->CNT = 0;
 		Flag_IRQ = 0;
 
 		// Заполнение окна

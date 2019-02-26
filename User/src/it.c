@@ -5,7 +5,7 @@
 //------------------------------------------------------------
 void DMA_IRQHandler (void)
 {
-	//Flag_IRQ = 1;
+	Flag_IRQ = 1;
   DMA_InitStructure.DMA_CycleSize = param.bufMode;
   DMA_Init (DMA_Channel_TIM1, &DMA_Channel_InitStructure);
 	
