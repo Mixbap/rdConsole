@@ -4,7 +4,7 @@
 #include "ini.h"
 //#include "console.h"
 
-//extern uint16_t RD;
+extern uint16_t RD;
 extern uint8_t Flag_IRQ;
 extern uint8_t firstIrq;
 

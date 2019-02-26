@@ -61,8 +61,8 @@ typedef struct
 	uint32_t freqMod;
 	uint32_t bufMode;
 	uint32_t amplMod;
-	uint32_t freqBw0;
-	uint32_t freqBw1;
+	uint8_t freqBw0;
+	uint8_t freqBw1;
 	uint32_t limitAcc;
 	uint32_t coefAdj;
 	uint32_t constMode;

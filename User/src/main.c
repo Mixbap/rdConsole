@@ -40,16 +40,17 @@ int main(void)
 //------------------------------------------------------------
 void checkLimits(void)
 {
+	/*
 	// Проверка выхода из прерывания
 	if (Flag_IRQ == 1)
 	{
-		RD = RD_TIMER->CNT;
-		RD_TIMER->CNT = 0;
+		//RD = RD_TIMER->CNT;
+		//RD_TIMER->CNT = 0;
 		Flag_IRQ = 0;
 		LED0_OFF;
 		LED1_OFF;
 	}
-	
+*/
 	// Проверка попадания в пороги
 	if (RD > param.freqBw0)
 	{
@@ -81,7 +82,6 @@ void checkLimits(void)
 		LED2_OFF;
 		n = 0;
 	}
-
 }
 
 //------------------------------------------------------------
