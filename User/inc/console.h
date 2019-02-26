@@ -23,6 +23,7 @@ enum typeError
 	freqBwError = -6, // Неверный ввод полосы пропускания
 	coefAdjError = -7, // Неверный ввод коэффициента корректировки
 	constModeError = -8, // Неверный ввод постоянной состовляющей модулирующего напряжения
+	selectModeError = -9, // Неверный ввод режима работы
 };
 
 void runConsole(void);
@@ -33,6 +34,7 @@ uint8_t deinterpret(uint8_t value);
 uint32_t dataInterpret(uint8_t* data, uint8_t idx);
 uint8_t dataDeinterpret(uint8_t* data, uint32_t value);
 
+void selectMode(void);
 void typeModHandler(void);
 void freqModHandler(void);
 void bufModeHandler(void);

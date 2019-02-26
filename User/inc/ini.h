@@ -56,6 +56,7 @@ extern DMA_ChannelInitTypeDef DMA_Channel_InitStructure;
 // Структура конфигурации блока
 typedef struct
 {
+	uint32_t mode;
 	uint32_t typeMod;
 	uint32_t freqMod;
 	uint32_t bufMode;

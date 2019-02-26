@@ -18,45 +18,48 @@ void runConsole(void)
 		// Обработчик команд меню 
 		switch (readData())
 		{
-		case 1:
-			typeModHandler();
-			break;
-		case 2:
-			freqModHandler();
-			break;
-		case 3:
-			bufModeHandler();
-			break;
-		case 4:
-			amplModHandler();
-			break;
-		case 5:
-			constModeHandler();
-			break;
-		case 6:
-			freqBwHandler();
-			break;
-		case 7:
-			limitAccHandler();
-			break;
-		case 8:
-			coefAdjHandler();
-			break;
-		case 9:
-			rdParamDefIni();
-			DMA_TX_start(defConf, sizeof(defConf));
-			break;	
-		case 10:
-			getConfig();
-			break;	
-		case 11:
-			DMA_TX_start(exit, sizeof(exit));
-			act = 0;
-			break;		
-		default:
-			DMA_TX_start(unsupCommand, sizeof(unsupCommand));
-			error = 0;
-			break;
+			case 1:
+				selectMode();
+				break;
+			case 2:
+				typeModHandler();
+				break;
+			case 3:
+				freqModHandler();
+				break;
+			case 4:
+				bufModeHandler();
+				break;
+			case 5:
+				amplModHandler();
+				break;
+			case 6:
+				constModeHandler();
+				break;
+			case 7:
+				freqBwHandler();
+				break;
+			case 8:
+				limitAccHandler();
+				break;
+			case 9:
+				coefAdjHandler();
+				break;
+			case 10:
+				rdParamDefIni();
+				DMA_TX_start(defConf, sizeof(defConf));
+				break;	
+			case 11:
+				getConfig();
+				break;	
+			case 12:
+				DMA_TX_start(exit, sizeof(exit));
+				act = 0;
+				break;		
+			default:
+				DMA_TX_start(unsupCommand, sizeof(unsupCommand));
+				error = 0;
+				break;
 		}
 	}
 
@@ -70,19 +73,21 @@ void runConsole(void)
 void printMenu(void)
 {
 	uint8_t hello[] = "\n\tTerminal of the block of processing of the radio sensor.\r\n";
-	uint8_t mode[] = "[1] Type of the modulating voltage\r\n";
-	uint8_t freq[] = "[2] Frequency of the modulating voltage\r\n";
-	uint8_t modeBuf[] = "[3] Size of the buffer of counting\r\n";
-	uint8_t modeAmp[] = "[4] Maximum amplitude of the modulating voltage\r\n";
-	uint8_t constMode[] = "[5] Constant of the modulating voltage\r\n";
-	uint8_t freqBw[] = "[6] Bandwidth of frequency of beats\r\n";
-	uint8_t limit[] = "[7] Limit accumulation\r\n";
-	uint8_t param[] = "[8] Adjustment coefficient\r\n";
-	uint8_t defConf[] = "[9] Set default configuration\r\n";
-	uint8_t getConf[] = "[10] Get configuration\r\n";
-	uint8_t exit[] = "[11] Exit terminal\r\n";
+	uint8_t selMode[] = "[1] Select mode\r\n";	
+	uint8_t mode[] = "[2] Set type of the modulating voltage\r\n";
+	uint8_t freq[] = "[3] Set frequency of the modulating voltage\r\n";
+	uint8_t modeBuf[] = "[4] Set size of the buffer of counting\r\n";
+	uint8_t modeAmp[] = "[5] Set maximum amplitude of the modulating voltage\r\n";
+	uint8_t constMode[] = "[6] Set constant of the modulating voltage\r\n";
+	uint8_t freqBw[] = "[7] Set bandwidth of frequency of beats\r\n";
+	uint8_t limit[] = "[8] Set limit accumulation\r\n";
+	uint8_t param[] = "[9] Set adjustment coefficient\r\n";
+	uint8_t defConf[] = "[10] Set default configuration\r\n";
+	uint8_t getConf[] = "[11] Get configuration\r\n";
+	uint8_t exit[] = "[12] Exit terminal\r\n";
 	
 	DMA_TX_start(hello, sizeof(hello));
+	DMA_TX_start(selMode, sizeof(selMode));
 	DMA_TX_start(mode, sizeof(mode));
 	DMA_TX_start(freq, sizeof(freq));
 	DMA_TX_start(modeBuf, sizeof(modeBuf));
@@ -207,6 +212,49 @@ uint32_t dataInterpret(uint8_t* data, uint8_t idx)
 	}
 
 	return result;
+}
+
+//--------------------------------------------------------------
+// Выбор режима работы
+//--------------------------------------------------------------
+void selectMode(void)
+{
+	uint32_t result;
+	uint8_t selMode[] = "Select mode:\r\n[1] Radio senser\r\n[2] Distance measurement\r\n";
+	uint8_t selModePrint[] = "Mode: ";
+	uint8_t senser[] = "Radio senser\r\n";
+	uint8_t dist[] = "Distance measurement\r\n";
+	
+	while(1)
+	{
+		DMA_TX_start(selMode, sizeof(selMode));
+		DMA_TX_start(cursor, sizeof(cursor));
+		result = readData();
+		
+		// Обработка ошибки
+		if (error < 0)
+		{
+			errorHandler();
+		}
+		else if ((result < 1) | (result > 2))
+		{
+			error = selectModeError;
+			errorHandler();
+		}
+		else
+		{
+			param.mode = result;
+			
+			// Вывод режима
+			DMA_TX_start(selModePrint, sizeof(selModePrint));
+			if (result == 1)
+				DMA_TX_start(senser, sizeof(senser));
+			else if (result == 2)
+				DMA_TX_start(dist, sizeof(dist));
+			
+			return;
+		}
+	}
 }
 
 //--------------------------------------------------------------
@@ -642,6 +690,7 @@ void getConfig(void)
 //--------------------------------------------------------------
 void errorHandler(void)
 {
+	uint8_t selectModeErrorArr[] = "error selectModeError: Incorrect select mode\r\n\n";
 	uint8_t incorInpArr[] = "error incorInp: Incorrect input\r\n\n";
 	uint8_t typeModeErrorArr[] = "error typeModeError: Incorrect type mode(values in the range 1-3)\r\n\n";
 	uint8_t freqModErrorArr[] = "error freqModError: Incorrect frequency(values less 200kHz)\r\n\n";
@@ -676,6 +725,9 @@ void errorHandler(void)
 			break;
 		case constModeError:
 			DMA_TX_start(constModeErrorArr, sizeof(constModeErrorArr));
+			break;
+		case selectModeError:
+			DMA_TX_start(selectModeErrorArr, sizeof(selectModeErrorArr));
 			break;
 	}
 	

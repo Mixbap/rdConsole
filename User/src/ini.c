@@ -24,6 +24,7 @@ uint16_t sin_gen[60] = {11,45,100,177,274,391,526,678,844,1024,1215,1415,
 //--------------------------------------------------------------
 void rdParamDefIni(void)
 {
+	param.mode = 1;
 	param.amplMod = 2047;
 	param.bufMode = 32;
 	param.coefAdj = 100;
