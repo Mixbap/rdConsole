@@ -46,16 +46,13 @@ void runConsole(void)
 				coefAdjHandler();
 				break;
 			case 10:
-				selectCapturePort();
-				break;
-			case 11:
 				rdParamDefIni();
 				DMA_TX_start(defConf, sizeof(defConf));
 				break;	
-			case 12:
+			case 11:
 				getConfig();
 				break;	
-			case 13:
+			case 12:
 				DMA_TX_start(exit, sizeof(exit));
 				act = 0;
 				break;		
@@ -85,10 +82,9 @@ void printMenu(void)
 	uint8_t freqBw[] = "[7] Set bandwidth of frequency of beats\r\n";
 	uint8_t limit[] = "[8] Set limit accumulation\r\n";
 	uint8_t param[] = "[9] Set adjustment coefficient\r\n";	
-	uint8_t selPort[] = "[10] Set capture port\r\n";
-	uint8_t defConf[] = "[11] Set default configuration\r\n";
-	uint8_t getConf[] = "[12] Get configuration\r\n";
-	uint8_t exit[] = "[13] Exit terminal\r\n";
+	uint8_t defConf[] = "[10] Set default configuration\r\n";
+	uint8_t getConf[] = "[11] Get configuration\r\n";
+	uint8_t exit[] = "[12] Exit terminal\r\n";
 	
 	DMA_TX_start(hello, sizeof(hello));
 	DMA_TX_start(selMode, sizeof(selMode));
@@ -100,7 +96,6 @@ void printMenu(void)
 	DMA_TX_start(freqBw, sizeof(freqBw));
 	DMA_TX_start(limit, sizeof(limit));
 	DMA_TX_start(param, sizeof(param));
-	DMA_TX_start(selPort, sizeof(selPort));
 	DMA_TX_start(defConf, sizeof(defConf));
 	DMA_TX_start(getConf, sizeof(getConf));
 	DMA_TX_start(exit, sizeof(exit));
@@ -618,49 +613,6 @@ void coefAdjHandler(void)
 }
 
 //--------------------------------------------------------------
-// Выбор канала захвата
-//--------------------------------------------------------------
-void selectCapturePort(void)
-{
-	uint32_t result;
-	uint8_t selPort[] = "Select capture port:\r\n[1] PC2\r\n[2] PE2\r\n";
-	uint8_t selPortPrint[] = "Port: ";
-	uint8_t portPc2[] = "PC2\r\n";
-	uint8_t portPe2[] = "PE2\r\n";
-	
-	while(1)
-	{
-		DMA_TX_start(selPort, sizeof(selPort));
-		DMA_TX_start(cursor, sizeof(cursor));
-		result = readData();
-		
-		// Обработка ошибки
-		if (error < 0)
-		{
-			errorHandler();
-		}
-		else if ((result < 1) | (result > 2))
-		{
-			error = selectPortError;
-			errorHandler();
-		}
-		else
-		{
-			flagPort = result;
-			
-			// Вывод порта захвата
-			DMA_TX_start(selPortPrint, sizeof(selPortPrint));
-			if (result == 1)
-				DMA_TX_start(portPc2, sizeof(portPc2));
-			else if (result == 2)
-				DMA_TX_start(portPe2, sizeof(portPe2));
-			
-			return;
-		}
-	}
-}
-
-//--------------------------------------------------------------
 // Вывод параметров по умолчанию
 //--------------------------------------------------------------
 void getConfig(void)
@@ -747,7 +699,6 @@ void errorHandler(void)
 	uint8_t freqBwErrorArr[] = "error freqBwError: Incorrect bandwidth\r\n\n";
 	uint8_t coefAdjErrorArr[] = "error coefAdjError: Incorrect coefficient(values in the range 0-100)\r\n\n";
 	uint8_t constModeErrorArr[] = "error constModeError: Incorrect constant(values less 4096)\r\n\n";
-	uint8_t selectPortErrorArr[] = "error selectPortError: Incorrect capture port\r\n\n";
 	
 	switch (error)
 	{
@@ -777,9 +728,6 @@ void errorHandler(void)
 			break;
 		case selectModeError:
 			DMA_TX_start(selectModeErrorArr, sizeof(selectModeErrorArr));
-			break;
-		case selectPortError:
-			DMA_TX_start(selectPortErrorArr, sizeof(selectPortErrorArr));
 			break;
 	}
 	

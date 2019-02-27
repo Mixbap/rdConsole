@@ -271,7 +271,7 @@ void TIMER_CAPTURE_ini(void)
 	
   TIMER_ChnOutInitTypeDef	TimerChnOutInitStructure;
 	
-	RST_CLK_PCLKcmd (RST_CLK_PCLK_PORTC | RST_CLK_PCLK_PORTE | RST_CLK_PCLK_TIMER3,	ENABLE);
+	RST_CLK_PCLKcmd (RST_CLK_PCLK_PORTC | RST_CLK_PCLK_TIMER3,	ENABLE);
 
   TIMER_BRGInit (RD_TIMER, TIMER_HCLKdiv1);     
 	
@@ -281,11 +281,7 @@ void TIMER_CAPTURE_ini(void)
 	PortInitStructure.PORT_OE    = PORT_OE_IN;
 	PortInitStructure.PORT_MODE  = PORT_MODE_DIGITAL;
 	PortInitStructure.PORT_Pin   = RD_Pin; 
-	//PORT_Init (RD_PORT, &PortInitStructure);	
-	if (flagPort == 1)
-		PORT_Init (MDR_PORTC, &PortInitStructure);	
-	else if (flagPort == 2)
-		PORT_Init (MDR_PORTE, &PortInitStructure);
+	PORT_Init (RD_PORT, &PortInitStructure);	
 
   TIMER_DeInit (RD_TIMER);
 

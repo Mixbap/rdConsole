@@ -22,9 +22,7 @@
 #define LED2_OFF	PORT_ResetBits(MDR_PORTB, PORT_Pin_2)
 #define LED3_OFF	PORT_ResetBits(MDR_PORTB, PORT_Pin_3)
 //------------------------------------------------------------
-extern uint8_t flagPort;
-
-//#define RD_PORT	    MDR_PORTC				
+#define RD_PORT	    MDR_PORTC				
 #define RD_Pin		  PORT_Pin_2        
 #define RD_TIMER	MDR_TIMER3 				
 #define RD_CHN	  TIMER_CHANNEL1
