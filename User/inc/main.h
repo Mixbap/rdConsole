@@ -21,4 +21,7 @@ int distance = 0;
 void checkLimits(void);
 void distanceMode(void);
 
+
+uint8_t flagPort = 1;
+
 #endif

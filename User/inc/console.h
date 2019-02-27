@@ -24,6 +24,7 @@ enum typeError
 	coefAdjError = -7, // Неверный ввод коэффициента корректировки
 	constModeError = -8, // Неверный ввод постоянной состовляющей модулирующего напряжения
 	selectModeError = -9, // Неверный ввод режима работы
+	selectPortError = -10 // Неверный ввод порта захвата
 };
 
 void runConsole(void);
@@ -43,6 +44,7 @@ void freqBwHandler(void);
 void limitAccHandler(void);
 void coefAdjHandler(void);
 void constModeHandler(void);
+void selectCapturePort(void);
 
 void getConfig(void);
 

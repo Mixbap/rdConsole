@@ -24,7 +24,7 @@ uint16_t sin_gen[60] = {11,45,100,177,274,391,526,678,844,1024,1215,1415,
 //--------------------------------------------------------------
 void rdParamDefIni(void)
 {
-	param.mode = 2;
+	param.mode = 1;
 	param.amplMod = 2047;
 	param.bufMode = 32;
 	param.coefAdj = 100;
@@ -271,16 +271,21 @@ void TIMER_CAPTURE_ini(void)
 	
   TIMER_ChnOutInitTypeDef	TimerChnOutInitStructure;
 	
-	RST_CLK_PCLKcmd (RST_CLK_PCLK_PORTC | RST_CLK_PCLK_TIMER3,	ENABLE);
+	RST_CLK_PCLKcmd (RST_CLK_PCLK_PORTC | RST_CLK_PCLK_PORTE | RST_CLK_PCLK_TIMER3,	ENABLE);
 
   TIMER_BRGInit (RD_TIMER, TIMER_HCLKdiv1);     
 	
 	PORT_StructInit (&PortInitStructure);
+	
 	PortInitStructure.PORT_FUNC  = PORT_FUNC_ALTER;
 	PortInitStructure.PORT_OE    = PORT_OE_IN;
 	PortInitStructure.PORT_MODE  = PORT_MODE_DIGITAL;
 	PortInitStructure.PORT_Pin   = RD_Pin; 
-	PORT_Init (RD_PORT, &PortInitStructure);	
+	//PORT_Init (RD_PORT, &PortInitStructure);	
+	if (flagPort == 1)
+		PORT_Init (MDR_PORTC, &PortInitStructure);	
+	else if (flagPort == 2)
+		PORT_Init (MDR_PORTE, &PortInitStructure);
 
   TIMER_DeInit (RD_TIMER);
 
