@@ -7,6 +7,9 @@ int main(void)
 	CLK_80_ini(); 			// Инициализация CLK = 80 MHz от HSE
 	LED_PortB_ini();		// Инициализация LED (PB0, PB1, PB2, PB3)
 	PortB_EXT_ini();		// Инициализация внешнего прерывания по PB10 (XS9 23 pin)
+	LCD_ini();					// Инициализация ЖКИ
+	LCD_mode_print(2);	// Вывод режима работы на ЖКИ
+	LCD_distance_print(52); // Вывод дальности на ЖКИ
 	
 	Modulator_ini();		// Инициализация модулятора
 	TIMER_CAPTURE_ini();// Инициализация таймера в режиме захвата (PC2 XS9 26 pin)
@@ -18,12 +21,12 @@ int main(void)
 		// Проверка выхода из терминала
 		if (flagConsole)
 		{
-			Modulator_ini(); 								// Инициализация модулятора
+			Modulator_ini();								// Инициализация модулятора
 			TIMER_CAPTURE_ini(); 						// Инициализация таймера в режиме захвата (PC2 XS9 26 pin)
 			NVIC_EnableIRQ(EXT_INT2_IRQn); 	// Разрешение внешних прерываний по PB10 (XS9 23 pin) 
-			flagConsole = 0;								// Сброс флага выхода из терминала
+			flagConsole = 0;								// Сброс флага выхода из терминала 
 		}
-		
+			
 		// Проверка выбранного режима работы
 		if (param.mode == 1)
 		{
@@ -50,38 +53,37 @@ void checkLimits(void)
 		LED0_OFF;
 		LED1_OFF;
 	}
-
-	// Проверка попадания в пороги
-	if (RD > param.freqBw0)
-	{
-		if (RD < param.freqBw1)
-			n++;
+		// Проверка попадания в пороги
+		if (RD > param.freqBw0)
+		{
+			if (RD < param.freqBw1)
+				n++;
+			else
+			{
+				if (n>0)
+					n--;
+			}
+		}
 		else
 		{
 			if (n>0)
 				n--;
 		}
-	}
-	else
-	{
-		if (n>0)
-			n--;
-	}
 
-	// Индикация попадания в пороги
-	if (RD > param.freqBw0)
-		LED0_ON;
-			
-	if (RD < param.freqBw1)
-		LED1_ON;
-	
-	// Проверка и индикация порога накопления
-	if (n == param.limitAcc)
-	{
-		LED3_ON;
-		LED2_OFF;
-		n = 0;
-	}
+		// Индикация попадания в пороги
+		if (RD > param.freqBw0)
+			LED0_ON;
+				
+		if (RD < param.freqBw1)
+			LED1_ON;
+		
+		// Проверка и индикация порога накопления
+		if (n == param.limitAcc)
+		{
+			LED3_ON;
+			LED2_OFF;
+			n = 0;
+		}
 }
 
 //------------------------------------------------------------
@@ -95,7 +97,7 @@ void distanceMode(void)
 	if (Flag_IRQ == 1)
 	{
 		Flag_IRQ = 0;
-
+		
 		// Заполнение окна
 		distanceArr[indDistance] = RD;
 		indDistance++;
@@ -108,6 +110,20 @@ void distanceMode(void)
 			result = result + distanceArr[i]; 
 		}
 		distance = (int)(result/DISTANCE_VALUE);
+		/*
+		// Вывод на ЖКИ
+		if (countStartLCD > 5000)
+		{
+			flagConsole = 1;
+			countStartLCD = 0;
+			LCD_mode_print(2);	// Вывод режима работы на ЖКИ
+			LCD_distance_print(distance); // Вывод дальности на ЖКИ
+		}
+		else
+		{
+			countStartLCD++;
+		}
+*/
 	}	
 }
 

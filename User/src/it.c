@@ -21,10 +21,8 @@ void EXT_INT2_IRQHandler(void)
 {
 	if (firstIrq)
 	{
-		LED3_ON;
 		runConsole();
 	}
 	
 	firstIrq = 1;
-	LED2_ON;
 }
