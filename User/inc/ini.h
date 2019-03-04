@@ -12,15 +12,15 @@
 #include "MDR32F9Qx_uart.h"             // Keil::Drivers:UART
 
 //------------------------------------------------------------
-#define LED0_ON		PORT_SetBits(MDR_PORTB, PORT_Pin_0)
-#define LED1_ON		PORT_SetBits(MDR_PORTB, PORT_Pin_1)
-#define LED2_ON		PORT_SetBits(MDR_PORTB, PORT_Pin_2)
-#define LED3_ON		PORT_SetBits(MDR_PORTB, PORT_Pin_3)
+#define LED0_ON()		PORT_SetBits(MDR_PORTB, PORT_Pin_0)
+#define LED1_ON()		PORT_SetBits(MDR_PORTB, PORT_Pin_1)
+#define LED2_ON()		PORT_SetBits(MDR_PORTB, PORT_Pin_2)
+#define LED3_ON()		PORT_SetBits(MDR_PORTB, PORT_Pin_3)
 
-#define LED0_OFF	PORT_ResetBits(MDR_PORTB, PORT_Pin_0)
-#define LED1_OFF	PORT_ResetBits(MDR_PORTB, PORT_Pin_1)
-#define LED2_OFF	PORT_ResetBits(MDR_PORTB, PORT_Pin_2)
-#define LED3_OFF	PORT_ResetBits(MDR_PORTB, PORT_Pin_3)
+#define LED0_OFF()	PORT_ResetBits(MDR_PORTB, PORT_Pin_0)
+#define LED1_OFF()	PORT_ResetBits(MDR_PORTB, PORT_Pin_1)
+#define LED2_OFF()	PORT_ResetBits(MDR_PORTB, PORT_Pin_2)
+#define LED3_OFF()	PORT_ResetBits(MDR_PORTB, PORT_Pin_3)
 //------------------------------------------------------------
 #define RD_PORT	    MDR_PORTC				
 #define RD_Pin		  PORT_Pin_2        

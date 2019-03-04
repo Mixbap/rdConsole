@@ -50,8 +50,8 @@ void checkLimits(void)
 	if (Flag_IRQ == 1)
 	{
 		Flag_IRQ = 0;
-		LED0_OFF;
-		LED1_OFF;
+		LED0_OFF();
+		LED1_OFF();
 	}
 		// Проверка попадания в пороги
 		if (RD > param.freqBw0)
@@ -72,16 +72,16 @@ void checkLimits(void)
 
 		// Индикация попадания в пороги
 		if (RD > param.freqBw0)
-			LED0_ON;
+			LED0_ON();
 				
 		if (RD < param.freqBw1)
-			LED1_ON;
+			LED1_ON();
 		
 		// Проверка и индикация порога накопления
 		if (n == param.limitAcc)
 		{
-			LED3_ON;
-			LED2_OFF;
+			LED3_ON();
+			LED2_OFF();
 			n = 0;
 		}
 }
