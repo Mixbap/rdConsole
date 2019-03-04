@@ -76,38 +76,45 @@ void runConsole(void)
 }
 
 //--------------------------------------------------------------
+// ¬ывод строки в консоль
+//  принимает:
+//    Message - текст дл€ вывода
+//--------------------------------------------------------------
+void WriteString(uint8_t Message[])
+{
+  DMA_TX_start(Message, sizeof(Message)); 
+}
+
+//--------------------------------------------------------------
+// ¬ывод строки в консоль, с переводом на новую строку
+//  принимает:
+//    Message - текст дл€ вывода
+//--------------------------------------------------------------
+void WriteLine(uint8_t Message[])
+{
+  DMA_TX_start(Message, sizeof(Message)); 
+  DMA_TX_start("\r\n", 2);
+}
+
+//--------------------------------------------------------------
 // ¬ывод меню
 //--------------------------------------------------------------
 void printMenu(void)
-{
-	uint8_t hello[] = "\n\tTerminal of the block of processing of the radio sensor.\r\n";
-	uint8_t selMode[] = "[1] Select mode\r\n";	
-	uint8_t mode[] = "[2] Set type of the modulating voltage\r\n";
-	uint8_t freq[] = "[3] Set frequency of the modulating voltage\r\n";
-	uint8_t modeBuf[] = "[4] Set size of the buffer of counting\r\n";
-	uint8_t modeAmp[] = "[5] Set maximum amplitude of the modulating voltage\r\n";
-	uint8_t constMode[] = "[6] Set constant of the modulating voltage\r\n";
-	uint8_t freqBw[] = "[7] Set bandwidth of frequency of beats\r\n";
-	uint8_t limit[] = "[8] Set limit accumulation\r\n";
-	uint8_t param[] = "[9] Set adjustment coefficient\r\n";	
-	uint8_t defConf[] = "[10] Set default configuration\r\n";
-	uint8_t getConf[] = "[11] Get configuration\r\n";
-	uint8_t exit[] = "[12] Exit terminal\r\n";
-	
-	DMA_TX_start(hello, sizeof(hello));
-	DMA_TX_start(selMode, sizeof(selMode));
-	DMA_TX_start(mode, sizeof(mode));
-	DMA_TX_start(freq, sizeof(freq));
-	DMA_TX_start(modeBuf, sizeof(modeBuf));
-	DMA_TX_start(modeAmp, sizeof(modeAmp));
-	DMA_TX_start(constMode, sizeof(constMode));
-	DMA_TX_start(freqBw, sizeof(freqBw));
-	DMA_TX_start(limit, sizeof(limit));
-	DMA_TX_start(param, sizeof(param));
-	DMA_TX_start(defConf, sizeof(defConf));
-	DMA_TX_start(getConf, sizeof(getConf));
-	DMA_TX_start(exit, sizeof(exit));
-	DMA_TX_start(cursor, sizeof(cursor));
+{	
+	WriteLine("\n\tTerminal of the block of processing of the radio sensor.");
+	WriteLine(" [1] Select mode");
+	WriteLine(" [2] Set type of the modulating voltage");
+	WriteLine(" [3] Set frequency of the modulating voltage");
+	WriteLine(" [4] Set size of the buffer of counting");
+	WriteLine(" [5] Set maximum amplitude of the modulating voltage");
+	WriteLine(" [6] Set constant of the modulating voltage");
+	WriteLine(" [7] Set constant of the modulating voltage");
+	WriteLine(" [8] Set limit accumulation");
+	WriteLine(" [9] Set adjustment coefficient");
+	WriteLine("[10] Set default configuration");
+	WriteLine("[11] Get configuration");
+	WriteLine("[12] Exit terminal");
+	WriteString("\r\n>> ");
 }
 
 //--------------------------------------------------------------

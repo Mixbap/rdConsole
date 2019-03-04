@@ -353,16 +353,16 @@ ARM Macro Assembler    Page 6
               00000200 
               00000000 
 Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M3 --apcs=interw
-ork --depend=.\objects\startup_mdr32f9qx.d -o.\objects\startup_mdr32f9qx.o -I"D
-:\Project\Project Keil\rdConsole\RTE" -I"D:\Project\Project Keil\rdConsole\RTE\
-Device\MDR1986BE92" -IC:\Keil_v5\ARM\PACK\ARM\CMSIS\4.5.0\CMSIS\Include -IC:\Ke
-il_v5\ARM\PACK\Keil\MDR1986BExx\1.4\Config -IC:\Keil_v5\ARM\PACK\Keil\MDR1986BE
-xx\1.4\Libraries\CMSIS\CM3\CoreSupport -IC:\Keil_v5\ARM\PACK\Keil\MDR1986BExx\1
-.4\Libraries\CMSIS\CM3\DeviceSupport\MDR32F9Qx\inc -IC:\Keil_v5\ARM\PACK\Keil\M
-DR1986BExx\1.4\Libraries\MDR32F9Qx_StdPeriph_Driver\inc --predefine="__EVAL SET
-A 1" --predefine="__UVISION_VERSION SETA 521" --predefine="_RTE_ SETA 1" --pred
-efine="USE_MDR32F9Q2_Rev1 SETA 1" --list=.\listings\startup_mdr32f9qx.lst RTE\D
-evice\MDR1986BE92\startup_MDR32F9Qx.s
+ork --depend=.\objects\startup_mdr32f9qx.d -o.\objects\startup_mdr32f9qx.o -IC:
+\Projects\rdConsole\RTE -IC:\Projects\rdConsole\RTE\Device\MDR1986BE92 -IC:\Kei
+l_v5\ARM\PACK\ARM\CMSIS\4.5.0\CMSIS\Include -IC:\Keil_v5\ARM\PACK\Keil\MDR1986B
+Exx\1.4\Config -IC:\Keil_v5\ARM\PACK\Keil\MDR1986BExx\1.4\Libraries\CMSIS\CM3\C
+oreSupport -IC:\Keil_v5\ARM\PACK\Keil\MDR1986BExx\1.4\Libraries\CMSIS\CM3\Devic
+eSupport\MDR32F9Qx\inc -IC:\Keil_v5\ARM\PACK\Keil\MDR1986BExx\1.4\Libraries\MDR
+32F9Qx_StdPeriph_Driver\inc --predefine="__EVAL SETA 1" --predefine="__UVISION_
+VERSION SETA 521" --predefine="_RTE_ SETA 1" --predefine="USE_MDR32F9Q2_Rev1 SE
+TA 1" --list=.\listings\startup_mdr32f9qx.lst RTE\Device\MDR1986BE92\startup_MD
+R32F9Qx.s
 
 
 
