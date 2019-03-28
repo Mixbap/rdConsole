@@ -335,7 +335,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>.\User\src;.\User\inc</IncludePath>
+              <IncludePath>.\User\src;.\User\inc;.\MELT_LCD_lib</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -398,6 +398,21 @@
               <FileName>console.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\User\src\console.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\User\src\lcd.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>MELT_LCD_lib</GroupName>
+          <Files>
+            <File>
+              <FileName>mlt_lcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\MELT_LCD_lib\mlt_lcd.c</FilePath>
             </File>
           </Files>
         </Group>

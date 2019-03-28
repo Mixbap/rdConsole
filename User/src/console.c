@@ -1,14 +1,14 @@
 // ***********************************************************************************
-// Микроконтроллер: K1986BE92QI
-// Устройство: Блок обработки радиолокационного датчика (дальномера)
-// Файл: console.c 
-// Назначение: Терминал для настройка конфигурации и параметров блока 
-// Компилятор:  Armcc 5.06 update 3 из комплекта Keil uVision 5.21.1.0 
+// РњРёРєСЂРѕРєРѕРЅС‚СЂРѕР»Р»РµСЂ: K1986BE92QI
+// РЈСЃС‚СЂРѕР№СЃС‚РІРѕ: Р‘Р»РѕРє РѕР±СЂР°Р±РѕС‚РєРё СЂР°РґРёРѕР»РѕРєР°С†РёРѕРЅРЅРѕРіРѕ РґР°С‚С‡РёРєР° (РґР°Р»СЊРЅРѕРјРµСЂР°)
+// Р¤Р°Р№Р»: console.c 
+// РќР°Р·РЅР°С‡РµРЅРёРµ: РўРµСЂРјРёРЅР°Р» РґР»СЏ РЅР°СЃС‚СЂРѕР№РєР° РєРѕРЅС„РёРіСѓСЂР°С†РёРё Рё РїР°СЂР°РјРµС‚СЂРѕРІ Р±Р»РѕРєР° 
+// РљРѕРјРїРёР»СЏС‚РѕСЂ:  Armcc 5.06 update 3 РёР· РєРѕРјРїР»РµРєС‚Р° Keil uVision 5.21.1.0 
 // ***********************************************************************************
 
 #include "console.h"
 //--------------------------------------------------------------
-// Запуск консоли
+// Р—Р°РїСѓСЃРє РєРѕРЅСЃРѕР»Рё
 //--------------------------------------------------------------
 void runConsole(void)
 {
@@ -16,14 +16,14 @@ void runConsole(void)
 	uint8_t defConf[] = "Set default configuraton succesfull!\r\n";
 	uint8_t exit[] = "Exit terminal succesfull!\r\n";
 	
-	DMA_ini(); 							// Инициализация DMA
-	UART1_DMA_ini(); 				// Инициализация UART1+DMA TX RX
+	DMA_ini(); 							// РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ DMA
+	UART1_DMA_ini(); 	// РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ UART1+DMA TX RX
 	
 	while (act)
 	{
 		printMenu();
 		
-		// Обработчик команд меню 
+		// РћР±СЂР°Р±РѕС‚С‡РёРє РєРѕРјР°РЅРґ РјРµРЅСЋ 
 		switch (readData())
 		{
 			case 1:
@@ -71,7 +71,7 @@ void runConsole(void)
 		}
 	}
 
-	UART_Cmd(MDR_UART1, DISABLE); // для нормальной работы ЦАП и ДМА
+	UART_Cmd(MDR_UART1, DISABLE); // РґР»СЏ РЅРѕСЂРјР°Р»СЊРЅРѕР№ СЂР°Р±РѕС‚С‹ Р¦РђРџ Рё Р”РњРђ
 	flagConsole = 1;
 }
 
@@ -97,7 +97,7 @@ void WriteLine(uint8_t Message[])
 }
 
 //--------------------------------------------------------------
-// Вывод меню
+// Р’С‹РІРѕРґ РјРµРЅСЋ
 //--------------------------------------------------------------
 void printMenu(void)
 {	
@@ -118,7 +118,7 @@ void printMenu(void)
 }
 
 //--------------------------------------------------------------
-// Ввод данных
+// Р’РІРѕРґ РґР°РЅРЅС‹С…
 //--------------------------------------------------------------
 uint32_t readData(void)
 {
@@ -133,8 +133,9 @@ uint32_t readData(void)
 	
 	return res;
 }
+
 //--------------------------------------------------------------
-// Интерпретатор ASCII цифр
+// РРЅС‚РµСЂРїСЂРµС‚Р°С‚РѕСЂ ASCII С†РёС„СЂ
 //--------------------------------------------------------------
 uint8_t interpret(uint8_t value)
 {
@@ -151,13 +152,13 @@ uint8_t interpret(uint8_t value)
 		case 0x38: return 8;
 		case 0x39: return 9;
 		default:
-			error = incorInp; // Некорректный ввод данных
+			error = incorInp;  // РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ РІРІРѕРґ РґР°РЅРЅС‹С…
 			return value;
 	}
 }
 
 //--------------------------------------------------------------
-// Деинтерпретатор ASCII цифр
+// Р”РµРёРЅС‚РµСЂРїСЂРµС‚Р°С‚РѕСЂ ASCII С†РёС„СЂ
 //--------------------------------------------------------------
 uint8_t deinterpret(uint8_t value)
 {
@@ -179,14 +180,14 @@ uint8_t deinterpret(uint8_t value)
 }
 
 //--------------------------------------------------------------
-// Деинтерпретатор данных
+// Р”РµРёРЅС‚РµСЂРїСЂРµС‚Р°С‚РѕСЂ РґР°РЅРЅС‹С…
 //--------------------------------------------------------------
 uint8_t dataDeinterpret(uint8_t* data, uint32_t value)
 {
 	uint8_t idx = 0, i = 0;
 	int ceil;
 	
-	// Размер данных
+	// Р Р°Р·РјРµСЂ РґР°РЅРЅС‹С…
 	while (!idx)
 	{
 		ceil = (int)(value/pow(10, i));
@@ -196,7 +197,7 @@ uint8_t dataDeinterpret(uint8_t* data, uint32_t value)
 		i++;
 	}
 	
-	// Получение массива данных
+	// РџРѕР»СѓС‡РµРЅРёРµ РјР°СЃСЃРёРІР° РґР°РЅРЅС‹С…
 	for (i = 0; i < idx; i++)
 	{
 		ceil = (int)(value/pow(10, idx-1-i));
@@ -207,20 +208,20 @@ uint8_t dataDeinterpret(uint8_t* data, uint32_t value)
 }
 
 //--------------------------------------------------------------
-// Интерпретатор входных данных
+// РРЅС‚РµСЂРїСЂРµС‚Р°С‚РѕСЂ РІС…РѕРґРЅС‹С… РґР°РЅРЅС‹С…
 //--------------------------------------------------------------
 uint32_t dataInterpret(uint8_t* data, uint8_t idx)
 {
 	uint8_t i = 0;
 	uint32_t result = 0;
 	
-	// Интрепретация массива данных по ASCII
+	// РРЅС‚СЂРµРїСЂРµС‚Р°С†РёСЏ РјР°СЃСЃРёРІР° РґР°РЅРЅС‹С… РїРѕ ASCII
 	for (i = 0; i < idx; i++)
 	{
 		data[i] = interpret(data[i]);
 	}
 
-	// Интерпретация целой части
+	// РРЅС‚РµСЂРїСЂРµС‚Р°С†РёСЏ С†РµР»РѕР№ С‡Р°СЃС‚Рё
 	for (i = 0; i < idx; i++)
 	{
 		result = result + (data[i] * (uint32_t)pow(10, idx - 1 - i));
@@ -230,7 +231,7 @@ uint32_t dataInterpret(uint8_t* data, uint8_t idx)
 }
 
 //--------------------------------------------------------------
-// Выбор режима работы
+// Р’С‹Р±РѕСЂ СЂРµР¶РёРјР° СЂР°Р±РѕС‚С‹
 //--------------------------------------------------------------
 void selectMode(void)
 {
@@ -246,7 +247,7 @@ void selectMode(void)
 		DMA_TX_start(cursor, sizeof(cursor));
 		result = readData();
 		
-		// Обработка ошибки
+		// РћР±СЂР°Р±РѕС‚РєР° РѕС€РёР±РєРё
 		if (error < 0)
 		{
 			errorHandler();
@@ -260,7 +261,7 @@ void selectMode(void)
 		{
 			param.mode = result;
 			
-			// Вывод режима
+			// Р’С‹РІРѕРґ СЂРµР¶РёРјР°
 			DMA_TX_start(selModePrint, sizeof(selModePrint));
 			if (result == 1)
 				DMA_TX_start(senser, sizeof(senser));
@@ -273,7 +274,7 @@ void selectMode(void)
 }
 
 //--------------------------------------------------------------
-// Задание формы модулирующего напряжения
+// Р—Р°РґР°РЅРёРµ С„РѕСЂРјС‹ РјРѕРґСѓР»РёСЂСѓСЋС‰РµРіРѕ РЅР°РїСЂСЏР¶РµРЅРёСЏ
 //--------------------------------------------------------------
 void typeModHandler(void)
 {
@@ -289,7 +290,7 @@ void typeModHandler(void)
 		DMA_TX_start(cursor, sizeof(cursor));
 		result = readData();
 		
-		// Обработка ошибки
+		// РћР±СЂР°Р±РѕС‚РєР° РѕС€РёР±РєРё
 		if (error < 0)
 		{
 			errorHandler();
@@ -303,7 +304,7 @@ void typeModHandler(void)
 		{
 			param.typeMod = result;
 			
-			// Вывод typeMod
+			// Р’С‹РІРѕРґ typeMod
 			DMA_TX_start(modePrint, sizeof(modePrint));
 			size = dataDeinterpret(data, (uint32_t)param.typeMod);
 			DMA_TX_start(data, size);
@@ -314,7 +315,7 @@ void typeModHandler(void)
 }
 
 //--------------------------------------------------------------
-// Задание частоты модулирующего напряжения
+// Р—Р°РґР°РЅРёРµ С‡Р°СЃС‚РѕС‚С‹ РјРѕРґСѓР»РёСЂСѓСЋС‰РµРіРѕ РЅР°РїСЂСЏР¶РµРЅРёСЏ
 //--------------------------------------------------------------
 void freqModHandler(void)
 {
@@ -330,7 +331,7 @@ void freqModHandler(void)
 		DMA_TX_start(cursor, sizeof(cursor));
 		result = readData();
 		
-		// Обработка ошибки
+		// РћР±СЂР°Р±РѕС‚РєР° РѕС€РёР±РєРё
 		if (error < 0)
 		{
 			errorHandler();
@@ -344,7 +345,7 @@ void freqModHandler(void)
 		{
 			param.freqMod = result;
 			
-			// Вывод freqMod
+			// Р’С‹РІРѕРґ freqMod
 			DMA_TX_start(freqPrint, sizeof(freqPrint));
 			size = dataDeinterpret(data, param.freqMod);
 			DMA_TX_start(data, size);
@@ -355,7 +356,7 @@ void freqModHandler(void)
 }
 
 //--------------------------------------------------------------
-// Задание размера буфера отсчетов модулирующего напряжения
+// Р—Р°РґР°РЅРёРµ СЂР°Р·РјРµСЂР° Р±СѓС„РµСЂР° РѕС‚СЃС‡РµС‚РѕРІ РјРѕРґСѓР»РёСЂСѓСЋС‰РµРіРѕ РЅР°РїСЂСЏР¶РµРЅРёСЏ
 //--------------------------------------------------------------
 void bufModeHandler(void)
 {
@@ -371,7 +372,7 @@ void bufModeHandler(void)
 		DMA_TX_start(cursor, sizeof(cursor));
 		result = readData();
 		
-		// Обработка ошибки
+		// РћР±СЂР°Р±РѕС‚РєР° РѕС€РёР±РєРё
 		if (error < 0)
 		{
 			errorHandler();
@@ -385,7 +386,7 @@ void bufModeHandler(void)
 		{
 			param.bufMode = result;
 			
-			// Вывод bufMode
+			// Р’С‹РІРѕРґ bufMode
 			DMA_TX_start(modeBufPrint, sizeof(modeBufPrint));
 			size = dataDeinterpret(data, param.bufMode);
 			DMA_TX_start(data, size);
@@ -395,8 +396,9 @@ void bufModeHandler(void)
 	}
 }
 
+
 //--------------------------------------------------------------
-// Задание амплитуды модулирующего напряжения
+// Р—Р°РґР°РЅРёРµ Р°РјРїР»РёС‚СѓРґС‹ РјРѕРґСѓР»РёСЂСѓСЋС‰РµРіРѕ РЅР°РїСЂСЏР¶РµРЅРёСЏ
 //--------------------------------------------------------------
 void amplModHandler(void)
 {
@@ -412,7 +414,7 @@ void amplModHandler(void)
 		DMA_TX_start(cursor, sizeof(cursor));
 		result = readData();
 		
-		// Обработка ошибки
+		// РћР±СЂР°Р±РѕС‚РєР° РѕС€РёР±РєРё
 		if (error < 0)
 		{
 			errorHandler();
@@ -428,7 +430,7 @@ void amplModHandler(void)
 			{
 				param.amplMod = result;
 				
-				// Вывод amplMod
+				// Р’С‹РІРѕРґ amplMod
 				DMA_TX_start(modeAmpPrint, sizeof(modeAmpPrint));
 				size = dataDeinterpret(data, param.amplMod);
 				DMA_TX_start(data, size);
@@ -447,7 +449,7 @@ void amplModHandler(void)
 			{
 				param.amplMod = result;
 				
-				// Вывод amplMod
+				// Р’С‹РІРѕРґ amplMod
 				DMA_TX_start(modeAmpPrint, sizeof(modeAmpPrint));
 				size = dataDeinterpret(data, param.amplMod);
 				DMA_TX_start(data, size);
@@ -459,7 +461,7 @@ void amplModHandler(void)
 }
 
 //--------------------------------------------------------------
-// Задание постоянной состовляющей модулирующего напряжения
+// Р—Р°РґР°РЅРёРµ РїРѕСЃС‚РѕСЏРЅРЅРѕР№ СЃРѕСЃС‚РѕРІР»СЏСЋС‰РµР№ РјРѕРґСѓР»РёСЂСѓСЋС‰РµРіРѕ РЅР°РїСЂСЏР¶РµРЅРёСЏ
 //--------------------------------------------------------------
 void constModeHandler(void)
 {
@@ -475,7 +477,7 @@ void constModeHandler(void)
 		DMA_TX_start(cursor, sizeof(cursor));
 		result = readData();
 		
-		// Обработка ошибки
+		// РћР±СЂР°Р±РѕС‚РєР° РѕС€РёР±РєРё
 		if (error < 0)
 		{
 			errorHandler();
@@ -489,7 +491,7 @@ void constModeHandler(void)
 		{
 			param.constMode = result;
 			
-			// Вывод constMode
+			// Р’С‹РІРѕРґ constMode
 			DMA_TX_start(constModePrint, sizeof(constModePrint));
 			size = dataDeinterpret(data, param.constMode);
 			DMA_TX_start(data, size);
@@ -500,7 +502,7 @@ void constModeHandler(void)
 }
 
 //--------------------------------------------------------------
-// Задание полосы пропускания частоты биений
+// Р—Р°РґР°РЅРёРµ РїРѕР»РѕСЃС‹ РїСЂРѕРїСѓСЃРєР°РЅРёСЏ С‡Р°СЃС‚РѕС‚С‹ Р±РёРµРЅРёР№
 //--------------------------------------------------------------
 void freqBwHandler(void)
 {
@@ -523,7 +525,7 @@ void freqBwHandler(void)
 		DMA_TX_start(cursor, sizeof(cursor));
 		result1 = readData();
 
-		// Обработка ошибки
+		// РћР±СЂР°Р±РѕС‚РєР° РѕС€РёР±РєРё
 		if (error < 0)
 		{
 			errorHandler();
@@ -543,7 +545,7 @@ void freqBwHandler(void)
 			param.freqBw0 = result0;
 			param.freqBw1 = result1;
 			
-			// Вывод freqBw
+			// Р’С‹РІРѕРґ freqBw
 			DMA_TX_start(freqBw, sizeof(freqBw));
 			size = dataDeinterpret(data, param.freqBw0);
 			DMA_TX_start(data, size);
@@ -558,7 +560,7 @@ void freqBwHandler(void)
 }
 
 //--------------------------------------------------------------
-// Задание порога накопления
+// Р—Р°РґР°РЅРёРµ РїРѕСЂРѕРіР° РЅР°РєРѕРїР»РµРЅРёСЏ
 //--------------------------------------------------------------
 void limitAccHandler(void)
 {
@@ -573,11 +575,11 @@ void limitAccHandler(void)
 		DMA_TX_start(cursor, sizeof(cursor));
 		param.limitAcc = readData();
 		
-		// Обработка ошибки
+		// РћР±СЂР°Р±РѕС‚РєР° РѕС€РёР±РєРё
 		if (error < 0)
 			errorHandler();
 		
-		// Вывод limitAcc
+		// Р’С‹РІРѕРґ limitAcc
 		DMA_TX_start(limitPrint, sizeof(limitPrint));	
 		size = dataDeinterpret(data, param.limitAcc);
 		DMA_TX_start(data, size);
@@ -587,7 +589,7 @@ void limitAccHandler(void)
 }
 
 //--------------------------------------------------------------
-// Задание коэффициента корректировки
+// Р—Р°РґР°РЅРёРµ РєРѕСЌС„С„РёС†РёРµРЅС‚Р° РєРѕСЂСЂРµРєС‚РёСЂРѕРІРєРё
 //--------------------------------------------------------------
 void coefAdjHandler(void)
 {
@@ -603,7 +605,7 @@ void coefAdjHandler(void)
 		DMA_TX_start(cursor, sizeof(cursor));
 		result = readData();
 		
-		// Обработка ошибки
+		// РћР±СЂР°Р±РѕС‚РєР° РѕС€РёР±РєРё
 		if (error < 0)
 		{
 			errorHandler();
@@ -617,7 +619,7 @@ void coefAdjHandler(void)
 		{
 			param.coefAdj = result;
 			
-			// Вывод coefAdj
+			// Р’С‹РІРѕРґ coefAdj
 			DMA_TX_start(coefPrint, sizeof(coefPrint));
 			size = dataDeinterpret(data, param.coefAdj);
 			DMA_TX_start(data, size);
@@ -628,7 +630,7 @@ void coefAdjHandler(void)
 }
 
 //--------------------------------------------------------------
-// Вывод параметров по умолчанию
+// Р’С‹РІРѕРґ РїР°СЂР°РјРµС‚СЂРѕРІ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 //--------------------------------------------------------------
 void getConfig(void)
 {
@@ -646,37 +648,37 @@ void getConfig(void)
 	uint8_t limit[] = "Limit accumulation:                          ";
 	uint8_t coef[] = "Adjustment coefficient:                      ";
 
-	// Вывод typeMod
+	// Р’С‹РІРѕРґ typeMod
 	DMA_TX_start(mode, sizeof(mode));
 	size = dataDeinterpret(data, (uint32_t)param.typeMod);
 	DMA_TX_start(data, size);
 	DMA_TX_start(transferLine, sizeof(transferLine));
 
-	// Вывод freqMod
+	// Р’С‹РІРѕРґ freqMod
 	DMA_TX_start(freq, sizeof(freq));
 	size = dataDeinterpret(data, param.freqMod);
 	DMA_TX_start(data, size);
 	DMA_TX_start(transferLine, sizeof(transferLine));
 	
-	// Вывод bufMode
+	// Р’С‹РІРѕРґ bufMode
 	DMA_TX_start(modeBuf, sizeof(modeBuf));
 	size = dataDeinterpret(data, param.bufMode);
 	DMA_TX_start(data, size);
 	DMA_TX_start(transferLine, sizeof(transferLine));
 	
-	// Вывод amplMod
+	// Р’С‹РІРѕРґ amplMod
 	DMA_TX_start(modeAmp, sizeof(modeAmp));
 	size = dataDeinterpret(data, param.amplMod);
 	DMA_TX_start(data, size);
 	DMA_TX_start(transferLine, sizeof(transferLine));
 	
-	// Вывод constMode
+	// Р’С‹РІРѕРґ constMode
 	DMA_TX_start(constMode, sizeof(constMode));
 	size = dataDeinterpret(data, param.constMode);
 	DMA_TX_start(data, size);
 	DMA_TX_start(transferLine, sizeof(transferLine));
 	
-	// Вывод freqBw
+	// Р’С‹РІРѕРґ freqBw
 	DMA_TX_start(freqBw, sizeof(freqBw));
 	size = dataDeinterpret(data, param.freqBw0);
 	DMA_TX_start(data, size);
@@ -686,13 +688,13 @@ void getConfig(void)
 	DMA_TX_start(freqBwScob, sizeof(freqBwScob));
 	DMA_TX_start(transferLine, sizeof(transferLine));
 		
-	// Вывод limitAcc
+	// Р’С‹РІРѕРґ limitAcc
 	DMA_TX_start(limit, sizeof(limit));	
 	size = dataDeinterpret(data, param.limitAcc);
 	DMA_TX_start(data, size);
 	DMA_TX_start(transferLine, sizeof(transferLine));
 	
-	// Вывод coefAdj
+	// Р’С‹РІРѕРґ coefAdj
 	DMA_TX_start(coef, sizeof(coef));
 	size = dataDeinterpret(data, param.coefAdj);
 	DMA_TX_start(data, size);
@@ -701,7 +703,7 @@ void getConfig(void)
 }
 
 //--------------------------------------------------------------
-// Обработчик ошибок
+// РћР±СЂР°Р±РѕС‚С‡РёРє РѕС€РёР±РѕРє
 //--------------------------------------------------------------
 void errorHandler(void)
 {
