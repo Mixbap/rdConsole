@@ -13,11 +13,19 @@ int main(void)
 {
 	rdParamDefIni();		// Инициализация параметров блока по умолчанию
 	CLK_80_ini(); 			// Инициализация CLK = 80 MHz от HSE
-	LED_PortB_ini();		// Инициализация LED (PB0, PB1, PB2, PB3)
+	
+	#ifdef IK_PORT
+		IK_port_ini();			// Инициализация порта выдачи ИК
+	#endif
+	
+	#ifdef LED
+		LED_PortB_ini();		// Инициализация LED (PB0, PB1, PB2, PB3)
+	#endif
+	
 	PortB_EXT_ini();		// Инициализация внешнего прерывания по PB10 (XS9 23 pin)
-	LCD_ini();					// Инициализация ЖКИ
-	LCD_mode_print(2);	// Вывод режима работы на ЖКИ
-	LCD_distance_print(52); // Вывод дальности на ЖКИ
+	//LCD_ini();					// Инициализация ЖКИ
+	//LCD_mode_print(2);	// Вывод режима работы на ЖКИ
+	//LCD_distance_print(52); // Вывод дальности на ЖКИ
 	
 	Modulator_ini();		// Инициализация модулятора
 	TIMER_CAPTURE_ini();// Инициализация таймера в режиме захвата (PC2 XS9 26 pin)
@@ -58,8 +66,11 @@ void checkLimits(void)
 	if (Flag_IRQ == 1)
 	{
 		Flag_IRQ = 0;
-		LED0_OFF();
-		LED1_OFF();
+		
+		#ifdef LED
+			LED0_OFF();
+			LED1_OFF();
+		#endif
 	}
 		// Проверка попадания в пороги
 		if (RD > param.freqBw0)
@@ -79,17 +90,27 @@ void checkLimits(void)
 		}
 
 		// Индикация попадания в пороги
-		if (RD > param.freqBw0)
-			LED0_ON();
-				
-		if (RD < param.freqBw1)
-			LED1_ON();
-		
+		#ifdef LED
+			if (RD > param.freqBw0)
+				LED0_ON();
+			
+			if (RD < param.freqBw1)
+				LED1_ON();
+		#endif
+			
 		// Проверка и индикация порога накопления
 		if (n == param.limitAcc)
 		{
-			LED3_ON();
-			LED2_OFF();
+			#ifdef LED
+				LED3_ON();
+				LED2_OFF();
+			#endif
+			
+			#ifdef IK_PORT
+				IK_ON();
+				delay(100000);
+				IK_OFF();
+			#endif
 			n = 0;
 		}
 }

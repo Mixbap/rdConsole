@@ -28,6 +28,15 @@ uint16_t sin_gen[60] = {11,45,100,177,274,391,526,678,844,1024,1215,1415,
 */
 
 //--------------------------------------------------------------
+// Функция реализации задержки
+//--------------------------------------------------------------
+void delay(uint32_t n)
+{
+	uint32_t i;
+	for (i = 0; i < n; i++) {}
+}
+
+//--------------------------------------------------------------
 // Инициализация параметров блока по умолчанию
 //--------------------------------------------------------------
 void rdParamDefIni(void)
@@ -116,6 +125,26 @@ void LED_PortB_ini(void)
 
 	PORT_Init(MDR_PORTB, &PortB_Ini);
 }
+
+//------------------------------------------------------------
+//Инициализация IK (PB0 XS9 13 pin)
+//------------------------------------------------------------
+void IK_port_ini(void)
+{
+	PORT_InitTypeDef PortB_Ini;
+	RST_CLK_PCLKcmd(RST_CLK_PCLK_PORTB, ENABLE);
+	
+	PortB_Ini.PORT_FUNC = PORT_FUNC_PORT;
+	PortB_Ini.PORT_MODE = PORT_MODE_DIGITAL;
+	PortB_Ini.PORT_OE = PORT_OE_OUT;
+	PortB_Ini.PORT_Pin = PORT_Pin_0;
+	PortB_Ini.PORT_PULL_DOWN = PORT_PULL_DOWN_OFF;
+	PortB_Ini.PORT_PULL_UP = PORT_PULL_UP_ON;
+	PortB_Ini.PORT_SPEED = PORT_SPEED_MAXFAST;
+
+	PORT_Init(MDR_PORTB, &PortB_Ini);
+}
+
 //------------------------------------------------------------
 //Расчет массива отсчетов синуса
 //------------------------------------------------------------

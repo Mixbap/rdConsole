@@ -19,24 +19,37 @@
 #include "MDR32F9Qx_eeprom.h"           // Keil::Drivers:EEMPROM
 #include "MDR32F9Qx_uart.h"             // Keil::Drivers:UART
 
-//------------------------------------------------------------
-#define LED0_ON()		PORT_SetBits(MDR_PORTB, PORT_Pin_0)
-#define LED1_ON()		PORT_SetBits(MDR_PORTB, PORT_Pin_1)
-#define LED2_ON()		PORT_SetBits(MDR_PORTB, PORT_Pin_2)
-#define LED3_ON()		PORT_SetBits(MDR_PORTB, PORT_Pin_3)
+#include "config.h"
 
-#define LED0_OFF()	PORT_ResetBits(MDR_PORTB, PORT_Pin_0)
-#define LED1_OFF()	PORT_ResetBits(MDR_PORTB, PORT_Pin_1)
-#define LED2_OFF()	PORT_ResetBits(MDR_PORTB, PORT_Pin_2)
-#define LED3_OFF()	PORT_ResetBits(MDR_PORTB, PORT_Pin_3)
 //------------------------------------------------------------
+#ifdef LED
+	#define LED0_ON()		PORT_SetBits(MDR_PORTB, PORT_Pin_0)
+	#define LED1_ON()		PORT_SetBits(MDR_PORTB, PORT_Pin_1)
+	#define LED2_ON()		PORT_SetBits(MDR_PORTB, PORT_Pin_2)
+	#define LED3_ON()		PORT_SetBits(MDR_PORTB, PORT_Pin_3)
+
+	#define LED0_OFF()	PORT_ResetBits(MDR_PORTB, PORT_Pin_0)
+	#define LED1_OFF()	PORT_ResetBits(MDR_PORTB, PORT_Pin_1)
+	#define LED2_OFF()	PORT_ResetBits(MDR_PORTB, PORT_Pin_2)
+	#define LED3_OFF()	PORT_ResetBits(MDR_PORTB, PORT_Pin_3)
+#endif
+//------------------------------------------------------------
+
+#ifdef IK_PORT
+	#define IK_ON()		PORT_SetBits(MDR_PORTB, PORT_Pin_0)
+	#define IK_OFF()	PORT_ResetBits(MDR_PORTB, PORT_Pin_0)
+#endif
+
 #define RD_PORT	    MDR_PORTC				
 #define RD_Pin		  PORT_Pin_2        
 #define RD_TIMER	MDR_TIMER3 				
 #define RD_CHN	  TIMER_CHANNEL1
 
+void delay(uint32_t n);
+
 void DAC2_PortE_ini(void);
 void LED_PortB_ini(void);
+void IK_port_ini(void);
 void CLK_80_ini(void);
 void DAC2_ini(void);
 void Sin_massiv(void);
