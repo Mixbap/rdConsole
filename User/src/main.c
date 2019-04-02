@@ -8,15 +8,13 @@
 #include "ini.h"
 #include "it.h"
 #include "lcd.h"
-
 #include "main.h"
-
-
-uint32_t n = 0;
-uint32_t countStartLCD = 0;
+#define DISTANCE_VALUE 3
 
 uint8_t flagConsole = 0;
 
+uint32_t n = 0;
+uint32_t countStartLCD = 0;
 uint16_t distanceArr[DISTANCE_VALUE];
 uint8_t indDistance = 0;
 int distance = 0;

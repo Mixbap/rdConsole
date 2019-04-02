@@ -7,20 +7,10 @@
 // ***********************************************************************************
 #ifndef MAIN_H
 #define MAIN_H
-
 #include <stdint.h>
-
-#define DISTANCE_VALUE 3
-
-extern uint32_t n;
-extern uint32_t countStartLCD;
 
 extern uint8_t flagConsole;
 
-extern uint16_t distanceArr[DISTANCE_VALUE];
-extern uint8_t indDistance;
-extern int distance;
-
-extern void checkLimits(void);
-extern void distanceMode(void);
+void checkLimits(void);
+void distanceMode(void);
 #endif
