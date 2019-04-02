@@ -11,9 +11,10 @@
 
 uint16_t RD = 0;
 uint8_t Flag_IRQ = 0;
-
+uint8_t flagConsole = 0;
 
 uint8_t firstIrq = 0;
+
 //------------------------------------------------------------
 // Обработчик прерываний от DMA
 //------------------------------------------------------------
@@ -34,7 +35,8 @@ void EXT_INT2_IRQHandler(void)
 {	
 	if (firstIrq)
 	{
-		runConsole();		
+		flagConsole = 1;
+		//runConsole();		
 	}	
 	firstIrq = 1;
 }

@@ -8,9 +8,6 @@
 #ifndef MAIN_H
 #define MAIN_H
 #include <stdint.h>
-
-extern uint8_t flagConsole;
-
-void checkLimits(void);
+void checkLimits(int localRD, uint32_t* n_ptr);
 void distanceMode(void);
 #endif

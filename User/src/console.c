@@ -81,7 +81,7 @@ void runConsole(void)
 	}
 
 	UART_Cmd(MDR_UART1, DISABLE); // для нормальной работы ЦАП и ДМА	
-	flagConsole = 1;
+	//flagConsole = 1;
 }
 
 //--------------------------------------------------------------
