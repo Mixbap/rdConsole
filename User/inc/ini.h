@@ -9,6 +9,8 @@
 #ifndef INI_H
 #define INI_H
 
+#include <stdint.h>
+
 #include "MDR32Fx.h"                    // Device header
 #include "MDR32F9Qx_config.h"           // Keil::Device:Startup_MDR1986BE9x
 #include "MDR32F9Qx_rst_clk.h"          // Keil::Drivers:RST_CLK

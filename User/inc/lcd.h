@@ -9,8 +9,7 @@
 #ifndef LCD_H
 #define LCD_H
 
-#include "mlt_lcd.h"
-#include "math.h"
+#include <stdint.h>
 
 void LCD_ini(void);
 void LCD_mode_print(uint8_t mode);

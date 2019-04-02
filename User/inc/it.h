@@ -8,14 +8,12 @@
 
 #ifndef IT_H
 #define IT_H
-
-#include "ini.h"
+#include <stdint.h>
 
 extern volatile uint16_t RD;
 extern uint8_t Flag_IRQ;
-extern uint8_t firstIrq;
 
-void DMA_IRQHandler(void);
-void EXT_INT2_IRQHandler(void);
+extern void DMA_IRQHandler(void);
+extern void EXT_INT2_IRQHandler(void);
 
 #endif

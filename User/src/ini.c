@@ -9,6 +9,8 @@
 #include "ini.h"
 #include <math.h>
 
+rdParam param;
+
 DMA_CtrlDataInitTypeDef DMA_InitStructure;
 DMA_ChannelInitTypeDef DMA_Channel_InitStructure;
 

@@ -5,9 +5,21 @@
 // Назначение: Анализ сигнала биений радиолокационного датчика и формирование модулирующего сигнала  
 // Компилятор:  Armcc 5.06 update 3 из комплекта Keil uVision 5.21.1.0 
 //--------------------------------------------------------------------------------------------------------
-// Можно ли тут писать по русски?
+#include "ini.h"
+#include "it.h"
+#include "lcd.h"
+
 #include "main.h"
 
+
+uint32_t n = 0;
+uint32_t countStartLCD = 0;
+
+uint8_t flagConsole = 0;
+
+uint16_t distanceArr[DISTANCE_VALUE];
+uint8_t indDistance = 0;
+int distance = 0;
 
 int main(void)
 {

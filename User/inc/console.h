@@ -8,19 +8,7 @@
 
 #ifndef CONSOLE_H
 #define CONSOLE_H
-
-#include "math.h"
-#include "ini.h"
-
-uint8_t transferLine[] = "\r\n";
-uint8_t cursor[] = "\n>> ";
-uint8_t unsupCommand[] = "Unsupported command!\r\n\n";
-
-extern uint8_t flagConsole;
-extern rdParam param;
-
-int error;
-
+#include <stdint.h>
 enum typeError
 {
 	incorInp = -1, // Некорректный ввод данных
