@@ -9,7 +9,7 @@
 #include "ini.h"
 #include "console.h"
 
-uint16_t RD = 0;
+volatile uint16_t  RD = 0;
 uint8_t Flag_IRQ = 0;
 uint8_t flagConsole = 0;
 
