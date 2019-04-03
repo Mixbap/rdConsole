@@ -12,9 +12,6 @@
 #include "main.h"
 #define DISTANCE_VALUE 3
 
-
-
-
 uint32_t countStartLCD = 0;
 uint16_t distanceArr[DISTANCE_VALUE];
 uint8_t indDistance = 0;
@@ -24,7 +21,7 @@ int main(void)
 {
 	uint32_t n = 0;
 
-	rdParamDefIni();		// Инициализация параметров блока по умолчанию
+	rdParamDefIni(&param);		// Инициализация параметров блока по умолчанию
 	CLK_80_ini(); 			// Инициализация CLK = 80 MHz от HSE
 	
 	#ifdef IK_PORT
@@ -40,7 +37,7 @@ int main(void)
 	//LCD_mode_print(2);	// Вывод режима работы на ЖКИ
 	//LCD_distance_print(52); // Вывод дальности на ЖКИ
 	
-	Modulator_ini();	// Инициализация модулятора
+	Modulator_ini(&param);	// Инициализация модулятора
 	TIMER_CAPTURE_ini();// Инициализация таймера в режиме захвата (PC2 XS9 26 pin)
 	
 	NVIC_EnableIRQ(EXT_INT2_IRQn); // Разрешение внешних прерываний по PB10 (XS9 23 pin)  
@@ -55,14 +52,15 @@ int main(void)
 		if (flagConsole)
 		{
 			runConsole();
-			Modulator_ini();								// Инициализация модулятора
+			Modulator_ini(&param);								// Инициализация модулятора
 			TIMER_CAPTURE_ini(); 						// Инициализация таймера в режиме захвата (PC2 XS9 26 pin)
 			NVIC_EnableIRQ(EXT_INT2_IRQn); 	// Разрешение внешних прерываний по PB10 (XS9 23 pin) 
 			flagConsole = 0;							// Сброс флага выхода из терминала 
 		}
 		if (Flag_IRQ)	
 		{
-			if (param.mode == 1)
+			Flag_IRQ = 0;
+			if 	(param.mode == 1)
 				checkLimits(RD, &n);// Проверка попадания в пороги (выдача ИК)
 			else if (param.mode == 2)
 				distanceMode(); // Режим измерения дальности
@@ -75,11 +73,6 @@ int main(void)
 //------------------------------------------------------------
 void checkLimits(int localRD, uint32_t *n_ptr)
 {
-	Flag_IRQ = 0;
-	#ifdef LED
-		LED0_OFF();
-		LED1_OFF();
-	#endif
 	// Проверка попадания в пороги
 	if (localRD > param.freqBw0 && localRD < param.freqBw1)
 	{		
@@ -90,14 +83,21 @@ void checkLimits(int localRD, uint32_t *n_ptr)
 		(*n_ptr)--;
 	}
 	// Индикация попадания в пороги
+	
 	#ifdef LED
+		// больше нижнего порога
 		if (localRD > param.freqBw0)
 			LED0_ON();
-		
+		else
+			LED0_OFF();
+
+		// меньше верхнего порога
 		if (localRD < param.freqBw1)
 			LED1_ON();
+		else
+			LED1_OFF();
 	#endif
-
+	
 	// Проверка и индикация порога накопления
 	if (*n_ptr == param.limitAcc)
 	{
@@ -121,8 +121,6 @@ void distanceMode(void)
 {
 	uint32_t i;
 	uint32_t result = 0;
-	Flag_IRQ = 0;
-	
 	// Заполнение окна
 	distanceArr[indDistance] = RD;
 	indDistance++;

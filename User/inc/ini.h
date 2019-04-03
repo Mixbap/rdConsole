@@ -54,12 +54,12 @@ void LED_PortB_ini(void);
 void IK_port_ini(void);
 void CLK_80_ini(void);
 void DAC2_ini(void);
-void Sin_massiv(void);
-void Pila_massiv(void);
-void Triangle_massiv(void);
-void DMA_DAC2_ini(void);
-void TIMER1_ini(void);
-void Modulator_ini(void);
+
+
+
+
+
+
 void TIMER_CAPTURE_ini(void);
 
 void UART1_DMA_ini(void);
@@ -69,7 +69,7 @@ uint8_t DMA_RX_start(uint8_t* buf, uint32_t buf_size);
 
 void PortB_EXT_ini(void);
 
-void rdParamDefIni(void);
+
 
 extern DMA_CtrlDataInitTypeDef DMA_InitStructure;
 extern DMA_ChannelInitTypeDef DMA_Channel_InitStructure;
@@ -89,6 +89,15 @@ typedef struct
 	uint32_t coefAdj;
 	uint32_t constMode;
 }rdParam;
+
+void rdParamDefIni(rdParam *localParam);
+void Sin_massiv(rdParam *localParam);
+void Pila_massiv(rdParam *localParam);
+void Triangle_massiv(rdParam *localParam);
+void Modulator_ini(rdParam *localParam);
+void DMA_DAC2_ini(rdParam *localParam);
+void TIMER1_ini(rdParam *localParam);
+
 
 extern rdParam param;
 

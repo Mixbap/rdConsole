@@ -41,18 +41,18 @@ void delay(uint32_t n)
 //--------------------------------------------------------------
 // Инициализация параметров блока по умолчанию
 //--------------------------------------------------------------
-void rdParamDefIni(void)
+void rdParamDefIni(rdParam *localParam)
 {
-	param.mode = 2;
-	param.amplMod = 2047;
-	param.bufMode = 32;
-	param.coefAdj = 100;
-	param.constMode = 2047;
-	param.freqBw0 = 95;
-	param.freqBw1 = 105;
-	param.freqMod = 100000;
-	param.limitAcc = 10;
-	param.typeMod = 1;
+	localParam->mode = 2;
+	localParam->amplMod = 2047;
+	localParam->bufMode = 32;
+	localParam->coefAdj = 100;
+	localParam->constMode = 2047;
+	localParam->freqBw0 = 95;
+	localParam->freqBw1 = 105;
+	localParam->freqMod = 100000;
+	localParam->limitAcc = 10;
+	localParam->typeMod = 1;
 }
 
 //--------------------------------------------------------------
@@ -152,59 +152,59 @@ void IK_port_ini(void)
 //------------------------------------------------------------
 //Расчет массива отсчетов синуса
 //---------------------------------------------------------
-void Sin_massiv(void)
+void Sin_massiv(rdParam *localParam)
 {
 	uint32_t i;
 	float w;
 	
-  w = 2 * 3.1415926535 / param.bufMode; 
+	w = 2 * 3.1415926535 / localParam->bufMode; 
 	
-	for (i = 0; i < param.bufMode; i++)
+	for (i = 0; i < localParam->bufMode; i++)
 	{
-     modArr[i] = param.constMode + param.amplMod * sin(w * i);
+     modArr[i] = localParam->constMode + localParam->amplMod * sin(w * i);
   }
 }
 //------------------------------------------------------------
 // Расчет массива отсчетов пилы
 //------------------------------------------------------------
-void Pila_massiv(void)
+void Pila_massiv(rdParam *localParam)
 {
 	uint32_t i;
 	float k;
 	
-	k = (float)(param.amplMod) / param.bufMode;
+	k = (float)(localParam->amplMod) / localParam->bufMode;
 	
-	for (i = 0; i < param.bufMode-1; i++)
+	for (i = 0; i < localParam->bufMode-1; i++)
 	{
 		modArr[i] = k * i;
 	}
-	modArr[param.bufMode-1] = modArr[0];
+	modArr[localParam->bufMode-1] = modArr[0];
 }
 
 //------------------------------------------------------------
 // Расчет массива отсчетов треугольника
 //------------------------------------------------------------
-void Triangle_massiv(void)
+void Triangle_massiv(rdParam *localParam)
 {
 	uint32_t i;
 	float k;
 	
-	k = (float)(param.amplMod * 2) / param.bufMode;
+	k = (float)(localParam->amplMod * 2) / localParam->bufMode;
 	
-	for (i = 0; i < param.bufMode/2; i++)
+	for (i = 0; i < localParam->bufMode/2; i++)
 	{
 		modArr[i] = k * i;
 	}
-		for (i = param.bufMode/2; i < param.bufMode; i++)
+		for (i = localParam->bufMode/2; i < localParam->bufMode; i++)
 	{
-		modArr[i] = k * (param.bufMode-i);
+		modArr[i] = k * (localParam->bufMode-i);
 	}
 }
 
 //------------------------------------------------------------
 //Инициализация DAC2+DMA+TIM1
 //------------------------------------------------------------
-void DMA_DAC2_ini(void)
+void DMA_DAC2_ini(rdParam *localParam)
 {
 	RST_CLK_PCLKcmd (RST_CLK_PCLK_DMA | RST_CLK_PCLK_SSP1 | RST_CLK_PCLK_SSP2, ENABLE);
 	
@@ -216,7 +216,7 @@ void DMA_DAC2_ini(void)
 	
 	DMA_InitStructure.DMA_SourceBaseAddr = (uint32_t) modArr;	              
   DMA_InitStructure.DMA_DestBaseAddr = (uint32_t)(&(MDR_DAC->DAC2_DATA));	
-  DMA_InitStructure.DMA_CycleSize = param.bufMode;							
+  DMA_InitStructure.DMA_CycleSize = localParam->bufMode;							
   DMA_InitStructure.DMA_SourceIncSize = DMA_SourceIncHalfword;				    
   DMA_InitStructure.DMA_DestIncSize = DMA_DestIncNo;				              
   DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;     
@@ -243,12 +243,12 @@ void DMA_DAC2_ini(void)
 //------------------------------------------------------------
 // Инициализация TIM1 для работы с DMA
 //------------------------------------------------------------	
-void TIMER1_ini(void)
+void TIMER1_ini(rdParam *localParam)
 {
 	TIMER_CntInitTypeDef TIM_CntInit;	
 	
 	uint32_t periodMod;
-	periodMod = ((uint16_t)((uint32_t)(80000000) / (uint32_t)(param.freqMod * param.bufMode)) - 1);
+	periodMod = ((uint16_t)((uint32_t)(80000000) / (uint32_t)(localParam->freqMod * localParam->bufMode)) - 1);
 	
   TIMER_DeInit (MDR_TIMER1);
 
@@ -279,27 +279,27 @@ void TIMER1_ini(void)
 //------------------------------------------------------------
 // Инициализация таймера в режиме захвата (PC2 XS9 26 pin)
 //------------------------------------------------------------
-void Modulator_ini(void)
+void Modulator_ini(rdParam *localParam)
 {
-	switch (param.typeMod)
+	switch (localParam->typeMod)
 	{
 		case 1:
-			Sin_massiv();
+			Sin_massiv(localParam);
 			break;
 		case 2:
-			Pila_massiv();
+			Pila_massiv(localParam);
 			break;
 		case 3:
-			Triangle_massiv();
+			Triangle_massiv(localParam);
 			break;
 	}
 
-	DMA_DAC2_ini();
+	DMA_DAC2_ini(localParam);
 	
 	DAC2_PortE_ini();
 	DAC2_ini();
 	
-	TIMER1_ini();
+	TIMER1_ini(localParam);
 }
 
 //------------------------------------------------------------------

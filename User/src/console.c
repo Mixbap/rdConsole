@@ -63,7 +63,7 @@ void runConsole(void)
 				coefAdjHandler();
 				break;
 			case 10:
-				rdParamDefIni();
+				rdParamDefIni(&param);
 				DMA_TX_start(defConf, sizeof(defConf));
 				break;	
 			case 11:
