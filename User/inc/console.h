@@ -9,8 +9,9 @@
 #ifndef CONSOLE_H
 #define CONSOLE_H
 #include <stdint.h>
-enum typeError
+typedef enum 
 {
+	successNoError = 0, // нет ошибки
 	incorInp = -1, // Некорректный ввод данных
 	typeModeError = -2, // Неверный тип модулирующего напряжения
 	freqModError = -3, // Неверный ввод частоты модулирующего напряжения
@@ -20,7 +21,7 @@ enum typeError
 	coefAdjError = -7, // Неверный ввод коэффициента корректировки
 	constModeError = -8, // Неверный ввод постоянной состовляющей модулирующего напряжения
 	selectModeError = -9, // Неверный ввод режима работы
-};
+}typeError;
 
 void runConsole(void);
 void printMenu(void);
@@ -42,7 +43,8 @@ void constModeHandler(void);
 
 void getConfig(void);
 
-void errorHandler(void);
-
+void printError(typeError localError);
+void processError(void);
+void resetError(void);
 #endif
 

@@ -10,6 +10,7 @@
 #include "lcd.h"
 #include "console.h"
 #include "main.h"
+#include "config.h"
 #define DISTANCE_VALUE 3
 
 uint32_t countStartLCD = 0;

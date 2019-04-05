@@ -13,7 +13,7 @@
 uint8_t transferLine[] = "\r\n";
 uint8_t cursor[] = "\n>> ";
 uint8_t unsupCommand[] = "Unsupported command!\r\n\n";
-int error;
+typeError error;
 
 
 //--------------------------------------------------------------
@@ -75,19 +75,18 @@ void runConsole(void)
 				break;		
 			default:
 				DMA_TX_start(unsupCommand, sizeof(unsupCommand));
-				error = 0;
+				resetError();
 				break;
 		}
 	}
 
 	UART_Cmd(MDR_UART1, DISABLE); // для нормальной работы ЦАП и ДМА	
-	//flagConsole = 1;
 }
 
 //--------------------------------------------------------------
-// ����� ������ � �������
-//  ���������:
-//    Message - ����� ��� ������
+// Выводит сообщение в порт без перевода строки
+//  принимает:
+//    Message - сообщение для вывода
 //--------------------------------------------------------------
 void WriteString(uint8_t Message[])
 {
@@ -95,9 +94,9 @@ void WriteString(uint8_t Message[])
 }
 
 //--------------------------------------------------------------
-// ����� ������ � �������, � ��������� �� ����� ������
-//  ���������:
-//    Message - ����� ��� ������
+// Выводит сообщение в порт с завершающим знаком new_line
+//  Принимает:
+//    Message - сообщение для вывода, без завершающего знака
 //--------------------------------------------------------------
 void WriteLine(uint8_t Message[])
 {
@@ -148,21 +147,13 @@ uint32_t readData(void)
 //--------------------------------------------------------------
 uint8_t interpret(uint8_t value)
 {
-	switch (value)
+
+	if (value >= '0' && value <= '9')
+		return value - '0';
+	else
 	{
-		case 0x30: return 0;
-		case 0x31: return 1;
-		case 0x32: return 2;
-		case 0x33: return 3;
-		case 0x34: return 4;
-		case 0x35: return 5;
-		case 0x36: return 6;
-		case 0x37: return 7;
-		case 0x38: return 8;
-		case 0x39: return 9;
-		default:
-			error = incorInp;  // Некорректный ввод данных
-			return value;
+		error = incorInp;
+		return value;
 	}
 }
 
@@ -171,21 +162,10 @@ uint8_t interpret(uint8_t value)
 //--------------------------------------------------------------
 uint8_t deinterpret(uint8_t value)
 {
-	switch (value)
-	{
-		case 0: return 0x30;
-		case 1: return 0x31;
-		case 2: return 0x32;
-		case 3: return 0x33;
-		case 4: return 0x34;
-		case 5: return 0x35;
-		case 6: return 0x36;
-		case 7: return 0x37;
-		case 8: return 0x38;
-		case 9: return 0x39;
-		default:
-			return value;
-	}
+	if (value < 10)
+		return value + '0';
+	else
+		return value;
 }
 
 //--------------------------------------------------------------
@@ -259,12 +239,13 @@ void selectMode(void)
 		// Обработка ошибки
 		if (error < 0)
 		{
-			errorHandler();
+			printError(error);
+			resetError();
 		}
 		else if ((result < 1) | (result > 2))
 		{
-			error = selectModeError;
-			errorHandler();
+			//error = selectModeError;
+			printError(selectModeError);
 		}
 		else
 		{
@@ -275,8 +256,7 @@ void selectMode(void)
 			if (result == 1)
 				DMA_TX_start(senser, sizeof(senser));
 			else if (result == 2)
-				DMA_TX_start(dist, sizeof(dist));
-			
+				DMA_TX_start(dist, sizeof(dist));			
 			return;
 		}
 	}
@@ -302,12 +282,11 @@ void typeModHandler(void)
 		// Обработка ошибки
 		if (error < 0)
 		{
-			errorHandler();
+			processError();		 
 		}
 		else if ((result > 3) | (result < 1))
-		{
-			error = typeModeError;
-			errorHandler();
+		{			
+		 	printError(typeModeError);
 		}
 		else 
 		{
@@ -343,12 +322,11 @@ void freqModHandler(void)
 		// Обработка ошибки
 		if (error < 0)
 		{
-			errorHandler();
+			processError();		 
 		}
 		else if (result > 200000)
-		{
-			error = freqModError;
-			errorHandler();
+		{			
+			printError(freqModError);
 		}
 		else
 		{
@@ -384,12 +362,11 @@ void bufModeHandler(void)
 		// Обработка ошибки
 		if (error < 0)
 		{
-			errorHandler();
+			processError();		 
 		}
 		else if (result > 255)
-		{
-			error = bufModeError;
-			errorHandler();
+		{			
+			printError(bufModeError);
 		}
 		else
 		{
@@ -426,14 +403,13 @@ void amplModHandler(void)
 		// Обработка ошибки
 		if (error < 0)
 		{
-			errorHandler();
+			processError();		 
 		}
 		else if (param.typeMod == 1)
 		{
 			if (result > 2047)
-			{
-				error = amplModError;
-				errorHandler();
+			{				
+				printError(amplModError);
 			}
 			else 
 			{
@@ -450,9 +426,8 @@ void amplModHandler(void)
 		else
 		{
 			if (result > 4095)
-			{
-				error = amplModError;
-				errorHandler();
+			{				
+			 	printError(amplModError);
 			}
 			else 
 			{
@@ -489,12 +464,11 @@ void constModeHandler(void)
 		// Обработка ошибки
 		if (error < 0)
 		{
-			errorHandler();
+			processError();
 		}
 		else if (result > 4095)
-		{
-			error = constModeError;
-			errorHandler();
+		{			
+			printError(constModeError);
 		}
 		else
 		{
@@ -537,17 +511,15 @@ void freqBwHandler(void)
 		// Обработка ошибки
 		if (error < 0)
 		{
-			errorHandler();
+			processError();
 		}
 		else if (result0 >= result1)
-		{
-			error = freqBwError;
-			errorHandler();
+		{			
+			printError(freqBwError);
 		}
 		else if ((result0 > 255) || (result1 > 255))
-		{
-			error = freqBwError;
-			errorHandler();
+		{			
+		 	printError(freqBwError);
 		}
 		else
 		{
@@ -586,7 +558,7 @@ void limitAccHandler(void)
 		
 		// Обработка ошибки
 		if (error < 0)
-			errorHandler();
+			processError();
 		
 		// Вывод limitAcc
 		DMA_TX_start(limitPrint, sizeof(limitPrint));	
@@ -617,12 +589,11 @@ void coefAdjHandler(void)
 		// Обработка ошибки
 		if (error < 0)
 		{
-			errorHandler();
+			processError();
 		}
 		else if (result > 100)
-		{
-			error = coefAdjError;
-			errorHandler();
+		{			
+			printError(coefAdjError);
 		}
 		else
 		{
@@ -714,7 +685,7 @@ void getConfig(void)
 //--------------------------------------------------------------
 // Обработчик ошибок
 //--------------------------------------------------------------
-void errorHandler(void)
+void  printError(typeError localError)
 {
 	uint8_t selectModeErrorArr[] = "error selectModeError: Incorrect select mode\r\n\n";
 	uint8_t incorInpArr[] = "error incorInp: Incorrect input\r\n\n";
@@ -726,7 +697,7 @@ void errorHandler(void)
 	uint8_t coefAdjErrorArr[] = "error coefAdjError: Incorrect coefficient(values in the range 0-100)\r\n\n";
 	uint8_t constModeErrorArr[] = "error constModeError: Incorrect constant(values less 4096)\r\n\n";
 	
-	switch (error)
+	switch (localError)
 	{
 		case incorInp:
 			DMA_TX_start(incorInpArr, sizeof(incorInpArr));
@@ -757,7 +728,18 @@ void errorHandler(void)
 			break;
 	}
 	
-	error = 0;
+	//error = 0;
+}
+
+void processError(void)
+{
+	printError(error);
+	resetError();
+}
+
+void resetError(void)
+{
+	error = successNoError;
 }
 
 
