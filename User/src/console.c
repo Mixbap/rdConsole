@@ -5,14 +5,15 @@
 // Назначение: Терминал для настройка конфигурации и параметров блока 
 // Компилятор:  Armcc 5.06 update 3 из комплекта Keil uVision 5.21.1.0 
 // ***********************************************************************************
+#include <stdlib.h>
 #include "console.h"
 #include "math.h"
 #include "ini.h"
 #include "main.h"
 
-uint8_t transferLine[] = "\r\n";
-uint8_t cursor[] = "\n>> ";
-uint8_t unsupCommand[] = "Unsupported command!\r\n\n";
+char transferLine[] = "\r\n";
+char cursor[] = "\n>> ";
+char unsupCommand[] = "Unsupported command!\r\n\n";
 typeError error;
 
 
@@ -22,9 +23,8 @@ typeError error;
 void runConsole(void)
 {
 	uint8_t act = 1;
-	uint8_t defConf[] = "Set default configuraton succesfull!\r\n";
-	uint8_t exit[] = "Exit terminal succesfull!\r\n";
-	
+	char defConf[] = "Set default configuraton succesfull!\r\n";
+	char exit[] = "Exit terminal succesfull!\r\n";
 	DMA_ini(); 							// Инициализация DMA
 	UART1_DMA_ini(); 	// Инициализация UART1+DMA TX RX
 	
@@ -35,46 +35,46 @@ void runConsole(void)
 		// Обработчик команд меню 
 		switch (readData())
 		{
-			case 1:
-				selectMode();
-				break;
+			case 1:				
+				selectMode(&(param.mode));					
+				break;				
 			case 2:
-				typeModHandler();
+				typeModHandler(&(param.typeMod));
 				break;
 			case 3:
-				freqModHandler();
+				freqModHandler(&(param.freqMod));
 				break;
 			case 4:
-				bufModeHandler();
+				bufModeHandler(&(param.bufMode));
 				break;
 			case 5:
-				amplModHandler();
-				break;
+				amplModHandler(&(param.amplMod), param.typeMod);
+				break;				
 			case 6:
-				constModeHandler();
+				constModeHandler(&(param.constMode));
 				break;
 			case 7:
-				freqBwHandler();
+				freqBwHandler(&(param.freqBw0), &(param.freqBw1));
 				break;
 			case 8:
-				limitAccHandler();
+				limitAccHandler(&(param.limitAcc));
 				break;
 			case 9:
-				coefAdjHandler();
+				coefAdjHandler(&(param.coefAdj));
 				break;
 			case 10:
 				rdParamDefIni(&param);
-				DMA_TX_start(defConf, sizeof(defConf));
+				WriteStringDMA(defConf);
 				break;	
 			case 11:
-				getConfig();
+				printConfig(param);
 				break;	
 			case 12:
-				DMA_TX_start(exit, sizeof(exit));
+				WriteStringDMA(exit);
 				act = 0;
 				break;		
 			default:
-				DMA_TX_start(unsupCommand, sizeof(unsupCommand));
+				WriteStringDMA(unsupCommand);
 				resetError();
 				break;
 		}
@@ -88,9 +88,17 @@ void runConsole(void)
 //  принимает:
 //    Message - сообщение для вывода
 //--------------------------------------------------------------
-void WriteString(uint8_t Message[])
+void WriteString(char Message[])
 {
-  DMA_TX_start(Message, sizeof(Message)); 
+	int i = 0;
+	char buf[100] = {0};
+	while (Message[i] != '\0')
+		{
+			buf[i] = Message[i];	
+			i++;
+		}
+	WriteStringDMA(buf);
+  //DMA_TX_start(Message, sizeof(Message)); 
 }
 
 //--------------------------------------------------------------
@@ -98,10 +106,17 @@ void WriteString(uint8_t Message[])
 //  Принимает:
 //    Message - сообщение для вывода, без завершающего знака
 //--------------------------------------------------------------
-void WriteLine(uint8_t Message[])
+void WriteLine(char Message[])
 {
-  DMA_TX_start(Message, sizeof(Message)); 
-  DMA_TX_start("\r\n", 2);
+	int i = 0;
+	char buf[100] = {0};
+	while (Message[i] != '\0')
+		{
+			buf[i] = Message[i];	
+			i++;
+		}	
+	WriteStringDMA(buf);
+	WriteStringDMA(transferLine);
 }
 
 //--------------------------------------------------------------
@@ -130,15 +145,15 @@ void printMenu(void)
 //--------------------------------------------------------------
 uint32_t readData(void)
 {
-	uint8_t data[20] = {0};
-	uint8_t idx = 0;
+	const int bufSize = 21;
+	char data[bufSize] = {0};
 	uint32_t res = 0;
 	
-	idx = DMA_RX_start(data, sizeof(data));
-	DMA_TX_start(transferLine, sizeof(transferLine));
-	
-	res = dataInterpret(data, idx);
-	
+	ReadStringDMA(data, bufSize);
+	WriteStringDMA(transferLine);
+
+	res = atoi((char*)data);			
+	//res = dataInterpret(data, idx);	
 	return res;
 }
 
@@ -221,43 +236,49 @@ uint32_t dataInterpret(uint8_t* data, uint8_t idx)
 
 //--------------------------------------------------------------
 // Выбор режима работы
+// 	изменяет режим работы mode при корректном выборе режима, не изменяет в случае ошибки
+//  осуществляет вывод сообщений об ошибке в COM порт
+// Возвращает :
+//  выбранный режим работы (1 или 2)
+//	-1 - некорректный ввод, введено нечисловое значение
+//	-2 - выбран недопустимый режим работы
+//
 //--------------------------------------------------------------
-void selectMode(void)
+int selectMode(uint32_t* mode)
 {
 	uint32_t result;
-	uint8_t selMode[] = "Select mode:\r\n[1] Radio senser\r\n[2] Distance measurement\r\n";
-	uint8_t selModePrint[] = "Mode: ";
-	uint8_t senser[] = "Radio senser\r\n";
-	uint8_t dist[] = "Distance measurement\r\n";
+	char selMode[] = "Select mode:\r\n[1] Radio senser\r\n[2] Distance measurement\r\n";
+	char selModePrint[] = "Mode: ";
+	char senser[] = "Radio senser\r\n";
+	char dist[] = "Distance measurement\r\n";
 	
 	while(1)
 	{
-		DMA_TX_start(selMode, sizeof(selMode));
-		DMA_TX_start(cursor, sizeof(cursor));
+		WriteStringDMA(selMode);
+		WriteStringDMA(cursor);		
 		result = readData();
 		
 		// Обработка ошибки
 		if (error < 0)
 		{
 			printError(error);
-			resetError();
+			resetError();			
 		}
-		else if ((result < 1) | (result > 2))
-		{
-			//error = selectModeError;
-			printError(selectModeError);
+		else if ((result < 1) || (result > 2))
+		{			
+			printError(selectModeError);			
 		}
 		else
 		{
-			param.mode = result;
-			
+			*mode = result;			
 			// Вывод режима
-			DMA_TX_start(selModePrint, sizeof(selModePrint));
+			WriteStringDMA(selModePrint);
+			//DMA_TX_start(selModePrint, sizeof(selModePrint));
 			if (result == 1)
-				DMA_TX_start(senser, sizeof(senser));
+				WriteStringDMA(senser);				
 			else if (result == 2)
-				DMA_TX_start(dist, sizeof(dist));			
-			return;
+				WriteStringDMA(dist);				
+			return result;
 		}
 	}
 }
@@ -265,39 +286,56 @@ void selectMode(void)
 //--------------------------------------------------------------
 // Задание формы модулирующего напряжения
 //--------------------------------------------------------------
-void typeModHandler(void)
+int typeModHandler(uint32_t* typeMod)
 {
 	uint32_t result;
-	uint8_t size;
-	uint8_t data[5] = {0};
-	uint8_t mode[] = "Type of the modulating voltage:\r\n[1] Sinus\r\n[2] Saw\r\n[3] Triangle\r\n";
-	uint8_t modePrint[] = "Type of the modulating voltage: ";
+	char mode[] = "Type of the modulating voltage:\r\n[1] Sinus\r\n[2] Saw\r\n[3] Triangle\r\n";
+	char modePrint[] = "Type of the modulating voltage: ";
+	char sineMode[] = "[1] Sine";
+	char sawMode[] = "[2] Saw";
+	char triangleMode[] = "[3] Triangle";
 	
 	while (1)
 	{
-		DMA_TX_start(mode, sizeof(mode));
-		DMA_TX_start(cursor, sizeof(cursor));
+		WriteStringDMA(mode);		
+		WriteStringDMA(cursor);
+
 		result = readData();
 		
 		// Обработка ошибки
 		if (error < 0)
 		{
-			processError();		 
+			processError();				
 		}
-		else if ((result > 3) | (result < 1))
+		else if ((result > 3) || (result < 1))
 		{			
-		 	printError(typeModeError);
+		 	printError(typeModeError);			
 		}
 		else 
 		{
-			param.typeMod = result;
-			
+			*typeMod = result;						
 			// Вывод typeMod
-			DMA_TX_start(modePrint, sizeof(modePrint));
-			size = dataDeinterpret(data, (uint32_t)param.typeMod);
-			DMA_TX_start(data, size);
-			DMA_TX_start(transferLine, sizeof(transferLine));
-			return;
+			WriteStringDMA(modePrint);
+			switch (result)
+			{
+				case 1: {
+					WriteStringDMA(sineMode);
+					break;
+				}
+				case 2: {
+					WriteStringDMA(sawMode);
+					break;
+				}
+				case 3: {
+					WriteStringDMA(triangleMode);
+					break;
+				}
+				default:{
+					break;
+				}
+			}			
+			WriteStringDMA(transferLine);		
+			return result;
 		}
 	}
 }
@@ -305,39 +343,42 @@ void typeModHandler(void)
 //--------------------------------------------------------------
 // Задание частоты модулирующего напряжения
 //--------------------------------------------------------------
-void freqModHandler(void)
+int freqModHandler(uint32_t* freqMod)
 {
 	uint32_t result;
 	uint8_t size;
 	uint8_t data[5] = {0};
-	uint8_t freq[] = "Enter frequency (Hz):\r\n";
-	uint8_t freqPrint[] = "Frequency of the modulating voltage: ";
+	char freq[] = "Enter frequency (Hz):\r\n";
+	char freqPrint[] = "Frequency of the modulating voltage: ";
 	
 	while (1)
 	{
-		DMA_TX_start(freq, sizeof(freq));
-		DMA_TX_start(cursor, sizeof(cursor));
+		WriteStringDMA(freq);
+		WriteStringDMA(cursor);
+
 		result = readData();
 		
 		// Обработка ошибки
 		if (error < 0)
 		{
-			processError();		 
+			processError();		
 		}
 		else if (result > 200000)
 		{			
-			printError(freqModError);
+			printError(freqModError);		
 		}
 		else
 		{
-			param.freqMod = result;
+			*freqMod = result;
 			
 			// Вывод freqMod
-			DMA_TX_start(freqPrint, sizeof(freqPrint));
-			size = dataDeinterpret(data, param.freqMod);
+			WriteStringDMA(freqPrint);		
+			// TODO переделать перевод числа в строку	
+			size = dataDeinterpret(data, result);
 			DMA_TX_start(data, size);
-			DMA_TX_start(transferLine, sizeof(transferLine));
-			return;
+
+			WriteStringDMA(transferLine);			
+			return result;
 		}
 	}
 }
@@ -345,24 +386,25 @@ void freqModHandler(void)
 //--------------------------------------------------------------
 // Задание размера буфера отсчетов модулирующего напряжения
 //--------------------------------------------------------------
-void bufModeHandler(void)
+int bufModeHandler(uint32_t* bufMode)
 {
 	uint32_t result;
 	uint8_t size;
 	uint8_t data[5] = {0};
-	uint8_t modeBuf[] = "Enter the buffer size:\r\n";
-	uint8_t modeBufPrint[] = "Size of the buffer of counting: ";
+	char modeBuf[] = "Enter the buffer size:\r\n";
+	char modeBufPrint[] = "Size of the buffer of counting: ";
 	
 	while (1)
 	{
-		DMA_TX_start(modeBuf, sizeof(modeBuf));
-		DMA_TX_start(cursor, sizeof(cursor));
+		WriteStringDMA(modeBuf);
+		WriteStringDMA(cursor);
+
 		result = readData();
 		
 		// Обработка ошибки
 		if (error < 0)
 		{
-			processError();		 
+			processError();			
 		}
 		else if (result > 255)
 		{			
@@ -370,14 +412,17 @@ void bufModeHandler(void)
 		}
 		else
 		{
-			param.bufMode = result;
+			*bufMode = result;
 			
 			// Вывод bufMode
-			DMA_TX_start(modeBufPrint, sizeof(modeBufPrint));
-			size = dataDeinterpret(data, param.bufMode);
+			WriteStringDMA(modeBufPrint);
+
+			// TODO переделать перевод числа в строку
+			size = dataDeinterpret(data, result);
 			DMA_TX_start(data, size);
-			DMA_TX_start(transferLine, sizeof(transferLine));
-			return;
+
+			WriteStringDMA(transferLine);			
+			return result;
 		}
 	}
 }
@@ -386,79 +431,62 @@ void bufModeHandler(void)
 //--------------------------------------------------------------
 // Задание амплитуды модулирующего напряжения
 //--------------------------------------------------------------
-void amplModHandler(void)
+int amplModHandler(uint32_t* amplMod, uint32_t typeMod)
 {
 	uint32_t result;
 	uint8_t size;
 	uint8_t data[5] = {0};
-	uint8_t modeAmp[] = "Enter amplitude:\r\n";
-	uint8_t modeAmpPrint[] = "Maximum amplitude of the modulating voltage: ";
+	char modeAmp[] = "Enter amplitude:\r\n";
+	char modeAmpPrint[] = "Maximum amplitude of the modulating voltage: ";
 	
 	while (1)
 	{
-		DMA_TX_start(modeAmp, sizeof(modeAmp));
-		DMA_TX_start(cursor, sizeof(cursor));
+		WriteStringDMA(modeAmp);
+		WriteStringDMA(cursor);
+
 		result = readData();
 		
 		// Обработка ошибки
 		if (error < 0)
 		{
-			processError();		 
+			processError();		
 		}
-		else if (param.typeMod == 1)
+		else if (result > (typeMod == 1? 2047 : 4095) )
 		{
-			if (result > 2047)
-			{				
-				printError(amplModError);
-			}
-			else 
-			{
-				param.amplMod = result;
-				
-				// Вывод amplMod
-				DMA_TX_start(modeAmpPrint, sizeof(modeAmpPrint));
-				size = dataDeinterpret(data, param.amplMod);
-				DMA_TX_start(data, size);
-				DMA_TX_start(transferLine, sizeof(transferLine));
-				return;
-			}
+			printError(amplModError);
 		}
 		else
 		{
-			if (result > 4095)
-			{				
-			 	printError(amplModError);
-			}
-			else 
-			{
-				param.amplMod = result;
-				
-				// Вывод amplMod
-				DMA_TX_start(modeAmpPrint, sizeof(modeAmpPrint));
-				size = dataDeinterpret(data, param.amplMod);
-				DMA_TX_start(data, size);
-				DMA_TX_start(transferLine, sizeof(transferLine));
-				return;
-			}
-		}
+			*amplMod = result;
+			// Вывод amplMod
+			WriteStringDMA(modeAmpPrint);		
+
+			// TODO переделать перевод числа в строку
+			size = dataDeinterpret(data, result);
+			DMA_TX_start(data, size);
+
+			WriteStringDMA(transferLine);			
+			return result;
+		}			
 	}
 }
 
 //--------------------------------------------------------------
 // Задание постоянной состовляющей модулирующего напряжения
 //--------------------------------------------------------------
-void constModeHandler(void)
+int constModeHandler(uint32_t* constModeParam)
 {
 	uint32_t result;
 	uint8_t size;
 	uint8_t data[5] = {0};
-	uint8_t constMode[] = "Enter constant:\r\n";
-	uint8_t constModePrint[] = "Constant of the modulating voltage: ";
+	char constMode[] = "Enter constant:\r\n";
+	char constModePrint[] = "Constant of the modulating voltage: ";
 	
 	while (1)
 	{
-		DMA_TX_start(constMode, sizeof(constMode));
-		DMA_TX_start(cursor, sizeof(cursor));
+		WriteStringDMA(constMode);
+		WriteStringDMA(cursor);
+		
 		result = readData();
 		
 		// Обработка ошибки
@@ -472,14 +500,15 @@ void constModeHandler(void)
 		}
 		else
 		{
-			param.constMode = result;
+			*constModeParam = result;
 			
 			// Вывод constMode
-			DMA_TX_start(constModePrint, sizeof(constModePrint));
-			size = dataDeinterpret(data, param.constMode);
+			WriteStringDMA(constModePrint);			
+			size = dataDeinterpret(data, result);
 			DMA_TX_start(data, size);
-			DMA_TX_start(transferLine, sizeof(transferLine));
-			return;
+
+			WriteStringDMA(transferLine);			
+			return result;
 		}
 	}
 }
@@ -487,35 +516,35 @@ void constModeHandler(void)
 //--------------------------------------------------------------
 // Задание полосы пропускания частоты биений
 //--------------------------------------------------------------
-void freqBwHandler(void)
+int freqBwHandler(uint8_t* freqBw0Param, uint8_t* freqBw1Param)
 {
 	uint32_t result0, result1;
 	uint8_t size;
 	uint8_t data[5] = {0};
-	uint8_t freqBw0[] = "Set lower bound:\r\n";
-	uint8_t freqBw1[] = "Set upper bound:\r\n";
-	uint8_t freqBw[] = "Bandwidth of frequency of beats: [";
-	uint8_t freqBwPoint[] = ",";
-	uint8_t freqBwScob[] = "]";
+	char freqBw0[] = "Set lower bound:\r\n";
+	char freqBw1[] = "Set upper bound:\r\n";
+	char freqBw[] = "Bandwidth of frequency of beats: [";
+	char freqBwPoint[] = ",";
+	char freqBwScob[] = "]";
 	
 	while (1)
 	{
-		DMA_TX_start(freqBw0, sizeof(freqBw0));
-		DMA_TX_start(cursor, sizeof(cursor));
+		WriteStringDMA(freqBw0);
+		WriteStringDMA(cursor);		
 		result0 = readData();
 		
-		DMA_TX_start(freqBw1, sizeof(freqBw1));
-		DMA_TX_start(cursor, sizeof(cursor));
+		WriteStringDMA(freqBw1);
+		WriteStringDMA(cursor);				
 		result1 = readData();
 
 		// Обработка ошибки
 		if (error < 0)
 		{
-			processError();
+			processError();		
 		}
 		else if (result0 >= result1)
 		{			
-			printError(freqBwError);
+			printError(freqBwError);	
 		}
 		else if ((result0 > 255) || (result1 > 255))
 		{			
@@ -523,19 +552,23 @@ void freqBwHandler(void)
 		}
 		else
 		{
-			param.freqBw0 = result0;
-			param.freqBw1 = result1;
+			*freqBw0Param = result0;
+			*freqBw1Param = result1;
 			
 			// Вывод freqBw
-			DMA_TX_start(freqBw, sizeof(freqBw));
-			size = dataDeinterpret(data, param.freqBw0);
+			WriteStringDMA(freqBw);
+
+			size = dataDeinterpret(data, result0);
 			DMA_TX_start(data, size);
-			DMA_TX_start(freqBwPoint, sizeof(freqBwPoint));
-			size = dataDeinterpret(data, param.freqBw1);
+			WriteStringDMA(freqBwPoint);	
+
+			size = dataDeinterpret(data, result1);
 			DMA_TX_start(data, size);
-			DMA_TX_start(freqBwScob, sizeof(freqBwScob));
-			DMA_TX_start(transferLine, sizeof(transferLine));
-			return;
+
+			WriteStringDMA(freqBwScob);
+
+			WriteStringDMA(transferLine);			
+			return result0;
 		}
 	}
 }
@@ -543,47 +576,54 @@ void freqBwHandler(void)
 //--------------------------------------------------------------
 // Задание порога накопления
 //--------------------------------------------------------------
-void limitAccHandler(void)
+int limitAccHandler(uint32_t* limitAcc)
 {
 	uint8_t size;
+	uint32_t result;
 	uint8_t data[5] = {0};
-	uint8_t limit[] = "Enter limit accumulation:\r\n";
-	uint8_t limitPrint[] = "Limit accumulation: ";
+	char limit[] = "Enter limit accumulation:\r\n";
+	char limitPrint[] = "Limit accumulation: ";
 	
 	while (1)
 	{
-		DMA_TX_start(limit, sizeof(limit));
-		DMA_TX_start(cursor, sizeof(cursor));
-		param.limitAcc = readData();
+		WriteStringDMA(limit);
+		WriteStringDMA(cursor);
+
+		result = readData();
 		
 		// Обработка ошибки
 		if (error < 0)
-			processError();
-		
+			{
+				processError();
+			}
+		*limitAcc = result;
 		// Вывод limitAcc
-		DMA_TX_start(limitPrint, sizeof(limitPrint));	
-		size = dataDeinterpret(data, param.limitAcc);
+		WriteStringDMA(limitPrint);	
+
+		size = dataDeinterpret(data, result);
 		DMA_TX_start(data, size);
-		DMA_TX_start(transferLine, sizeof(transferLine));
-		return;
+
+		WriteStringDMA(transferLine);		
+		return result;
 	}
 }
 
 //--------------------------------------------------------------
 // Задание коэффициента корректировки
 //--------------------------------------------------------------
-void coefAdjHandler(void)
+int coefAdjHandler(uint32_t* coefAdj)
 {
 	uint32_t result;
 	uint8_t size;
 	uint8_t data[5] = {0};
-	uint8_t paramAdj[] = "Enter adjustment coefficient:\r\n";
-	uint8_t coefPrint[] = "Adjustment coefficient: ";
+	char paramAdj[] = "Enter adjustment coefficient:\r\n";
+	char coefPrint[] = "Adjustment coefficient: ";
 	
 	while (1)
 	{
-		DMA_TX_start(paramAdj, sizeof(paramAdj));
-		DMA_TX_start(cursor, sizeof(cursor));
+		WriteStringDMA(paramAdj);
+		WriteStringDMA(cursor);
+
 		result = readData();
 		
 		// Обработка ошибки
@@ -597,14 +637,16 @@ void coefAdjHandler(void)
 		}
 		else
 		{
-			param.coefAdj = result;
+			*coefAdj = result;
 			
 			// Вывод coefAdj
-			DMA_TX_start(coefPrint, sizeof(coefPrint));
-			size = dataDeinterpret(data, param.coefAdj);
+			WriteStringDMA(coefPrint);
+
+			size = dataDeinterpret(data, result);
 			DMA_TX_start(data, size);
-			DMA_TX_start(transferLine, sizeof(transferLine));
-			return;
+
+			WriteStringDMA(transferLine);
+			return result;
 		}
 	}
 }
@@ -612,73 +654,75 @@ void coefAdjHandler(void)
 //--------------------------------------------------------------
 // Вывод параметров по умолчанию
 //--------------------------------------------------------------
-void getConfig(void)
+void printConfig(rdParam localParam)
 {
 	uint8_t data[5] = {0};
 	uint8_t size;
 
-	uint8_t mode[] = "Type of the modulating voltage:              ";
-	uint8_t freq[] = "Frequency of the modulating voltage:         ";
-	uint8_t modeBuf[] = "Size of the buffer of counting:              ";
-	uint8_t modeAmp[] = "Maximum amplitude of the modulating voltage: ";
-	uint8_t constMode[] = "Constant of the modulating voltage:          ";
-	uint8_t freqBw[] = "Bandwidth of frequency of beats:             [";
-	uint8_t freqBwPoint[] = ",";
-	uint8_t freqBwScob[] = "]";
-	uint8_t limit[] = "Limit accumulation:                          ";
-	uint8_t coef[] = "Adjustment coefficient:                      ";
+	char mode[] = "Type of the modulating voltage:              ";
+	char freq[] = "Frequency of the modulating voltage:         ";
+	char modeBuf[] = "Size of the buffer of counting:              ";
+	char modeAmp[] = "Maximum amplitude of the modulating voltage: ";
+	char constMode[] = "Constant of the modulating voltage:          ";
+	char freqBw[] = "Bandwidth of frequency of beats:             [";
+	char freqBwPoint[] = ",";
+	char freqBwScob[] = "]";
+	char limit[] = "Limit accumulation:                          ";
+	char coef[] = "Adjustment coefficient:                      ";
 
 	// Вывод typeMod
-	DMA_TX_start(mode, sizeof(mode));
-	size = dataDeinterpret(data, (uint32_t)param.typeMod);
+	WriteStringDMA(mode);
+	size = dataDeinterpret(data, (uint32_t)localParam.typeMod);
 	DMA_TX_start(data, size);
-	DMA_TX_start(transferLine, sizeof(transferLine));
+	WriteStringDMA(transferLine);
 
 	// Вывод freqMod
-	DMA_TX_start(freq, sizeof(freq));
-	size = dataDeinterpret(data, param.freqMod);
+	WriteStringDMA(freq);
+
+	size = dataDeinterpret(data, localParam.freqMod);
 	DMA_TX_start(data, size);
-	DMA_TX_start(transferLine, sizeof(transferLine));
+
+	WriteStringDMA(transferLine);
 	
 	// Вывод bufMode
-	DMA_TX_start(modeBuf, sizeof(modeBuf));
-	size = dataDeinterpret(data, param.bufMode);
+	WriteStringDMA(modeBuf);
+	size = dataDeinterpret(data, localParam.bufMode);
 	DMA_TX_start(data, size);
-	DMA_TX_start(transferLine, sizeof(transferLine));
+	WriteStringDMA(transferLine);
 	
 	// Вывод amplMod
-	DMA_TX_start(modeAmp, sizeof(modeAmp));
-	size = dataDeinterpret(data, param.amplMod);
+	WriteStringDMA(modeAmp);
+	size = dataDeinterpret(data, localParam.amplMod);
 	DMA_TX_start(data, size);
-	DMA_TX_start(transferLine, sizeof(transferLine));
+	WriteStringDMA(transferLine);
 	
 	// Вывод constMode
-	DMA_TX_start(constMode, sizeof(constMode));
-	size = dataDeinterpret(data, param.constMode);
+	WriteStringDMA(constMode);
+	size = dataDeinterpret(data, localParam.constMode);
 	DMA_TX_start(data, size);
-	DMA_TX_start(transferLine, sizeof(transferLine));
+	WriteStringDMA(transferLine);
 	
 	// Вывод freqBw
-	DMA_TX_start(freqBw, sizeof(freqBw));
-	size = dataDeinterpret(data, param.freqBw0);
+	WriteStringDMA(freqBw);
+	size = dataDeinterpret(data, localParam.freqBw0);
 	DMA_TX_start(data, size);
-	DMA_TX_start(freqBwPoint, sizeof(freqBwPoint));
-	size = dataDeinterpret(data, param.freqBw1);
+	WriteStringDMA(freqBwPoint);
+	size = dataDeinterpret(data, localParam.freqBw1);
 	DMA_TX_start(data, size);
-	DMA_TX_start(freqBwScob, sizeof(freqBwScob));
-	DMA_TX_start(transferLine, sizeof(transferLine));
+	WriteStringDMA(freqBwScob);
+	WriteStringDMA(transferLine);
 		
 	// Вывод limitAcc
-	DMA_TX_start(limit, sizeof(limit));	
-	size = dataDeinterpret(data, param.limitAcc);
+	WriteStringDMA(limit);	
+	size = dataDeinterpret(data, localParam.limitAcc);
 	DMA_TX_start(data, size);
-	DMA_TX_start(transferLine, sizeof(transferLine));
+	WriteStringDMA(transferLine);
 	
 	// Вывод coefAdj
-	DMA_TX_start(coef, sizeof(coef));
-	size = dataDeinterpret(data, param.coefAdj);
+	WriteStringDMA(coef);
+	size = dataDeinterpret(data, localParam.coefAdj);
 	DMA_TX_start(data, size);
-	DMA_TX_start(transferLine, sizeof(transferLine));
+	WriteStringDMA(transferLine);
 	
 }
 
@@ -687,44 +731,44 @@ void getConfig(void)
 //--------------------------------------------------------------
 void  printError(typeError localError)
 {
-	uint8_t selectModeErrorArr[] = "error selectModeError: Incorrect select mode\r\n\n";
-	uint8_t incorInpArr[] = "error incorInp: Incorrect input\r\n\n";
-	uint8_t typeModeErrorArr[] = "error typeModeError: Incorrect type mode(values in the range 1-3)\r\n\n";
-	uint8_t freqModErrorArr[] = "error freqModError: Incorrect frequency(values less 200kHz)\r\n\n";
-	uint8_t bufModeErrorArr[] = "error bufModeError: Incorrect length buffer(values less 256)\r\n\n";
-	uint8_t amplModErrorArr[] = "error amplModError: Incorrect amplitude(sinus - less 2048, other - less 4096)\r\n\n";
-	uint8_t freqBwErrorArr[] = "error freqBwError: Incorrect bandwidth\r\n\n";
-	uint8_t coefAdjErrorArr[] = "error coefAdjError: Incorrect coefficient(values in the range 0-100)\r\n\n";
-	uint8_t constModeErrorArr[] = "error constModeError: Incorrect constant(values less 4096)\r\n\n";
+	char selectModeErrorArr[] = "error selectModeError: Incorrect select mode\r\n\n";
+	char incorInpArr[] = "error incorInp: Incorrect input\r\n\n";
+	char typeModeErrorArr[] = "error typeModeError: Incorrect type mode(values in the range 1-3)\r\n\n";
+	char freqModErrorArr[] = "error freqModError: Incorrect frequency(values less 200kHz)\r\n\n";
+	char bufModeErrorArr[] = "error bufModeError: Incorrect length buffer(values less 256)\r\n\n";
+	char amplModErrorArr[] = "error amplModError: Incorrect amplitude(sinus - less 2048, other - less 4096)\r\n\n";
+	char freqBwErrorArr[] = "error freqBwError: Incorrect bandwidth\r\n\n";
+	char coefAdjErrorArr[] = "error coefAdjError: Incorrect coefficient(values in the range 0-100)\r\n\n";
+	char constModeErrorArr[] = "error constModeError: Incorrect constant(values less 4096)\r\n\n";
 	
 	switch (localError)
 	{
 		case incorInp:
-			DMA_TX_start(incorInpArr, sizeof(incorInpArr));
+			WriteStringDMA(incorInpArr);
 			break;
 		case typeModeError:
-			DMA_TX_start(typeModeErrorArr, sizeof(typeModeErrorArr));
+			WriteStringDMA(typeModeErrorArr);
 			break;
 		case freqModError:
-			DMA_TX_start(freqModErrorArr, sizeof(freqModErrorArr));
+			WriteStringDMA(freqModErrorArr);
 			break;
 		case bufModeError:
-			DMA_TX_start(bufModeErrorArr, sizeof(bufModeErrorArr));
+			WriteStringDMA(bufModeErrorArr);
 			break;
 		case amplModError:
-			DMA_TX_start(amplModErrorArr, sizeof(amplModErrorArr));
+			WriteStringDMA(amplModErrorArr);
 			break;
 		case freqBwError:
-			DMA_TX_start(freqBwErrorArr, sizeof(freqBwErrorArr));
+			WriteStringDMA(freqBwErrorArr);
 			break;
 		case coefAdjError:
-			DMA_TX_start(coefAdjErrorArr, sizeof(coefAdjErrorArr));
+			WriteStringDMA(coefAdjErrorArr);
 			break;
 		case constModeError:
-			DMA_TX_start(constModeErrorArr, sizeof(constModeErrorArr));
+			WriteStringDMA(constModeErrorArr);
 			break;
 		case selectModeError:
-			DMA_TX_start(selectModeErrorArr, sizeof(selectModeErrorArr));
+			WriteStringDMA(selectModeErrorArr);
 			break;
 	}
 	

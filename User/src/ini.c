@@ -5,9 +5,10 @@
 // Назначение: Инициализация периферии микроконтроллера  
 // Компилятор:  Armcc 5.06 update 3 из комплекта Keil uVision 5.21.1.0 
 // ***********************************************************************************
-
-#include "ini.h"
 #include <math.h>
+#include <string.h>
+#include "ini.h"
+
 
 rdParam param;
 
@@ -209,35 +210,35 @@ void DMA_DAC2_ini(rdParam *localParam)
 	RST_CLK_PCLKcmd (RST_CLK_PCLK_DMA | RST_CLK_PCLK_SSP1 | RST_CLK_PCLK_SSP2, ENABLE);
 	
 	NVIC->ICPR[0] = 0xFFFFFFFF;
-  NVIC->ICER[0] = 0xFFFFFFFF;
+  	NVIC->ICER[0] = 0xFFFFFFFF;
 	
 	DMA_DeInit();
-  DMA_StructInit (&DMA_Channel_InitStructure);
+  	DMA_StructInit (&DMA_Channel_InitStructure);
 	
 	DMA_InitStructure.DMA_SourceBaseAddr = (uint32_t) modArr;	              
-  DMA_InitStructure.DMA_DestBaseAddr = (uint32_t)(&(MDR_DAC->DAC2_DATA));	
-  DMA_InitStructure.DMA_CycleSize = localParam->bufMode;							
-  DMA_InitStructure.DMA_SourceIncSize = DMA_SourceIncHalfword;				    
-  DMA_InitStructure.DMA_DestIncSize = DMA_DestIncNo;				              
-  DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;     
-  DMA_InitStructure.DMA_NumContinuous = DMA_Transfers_32;				          
-  DMA_InitStructure.DMA_SourceProtCtrl = DMA_SourcePrivileged;			      
-  DMA_InitStructure.DMA_DestProtCtrl = DMA_DestPrivileged;			          
-  DMA_InitStructure.DMA_Mode = DMA_Mode_Basic;							              
+  	DMA_InitStructure.DMA_DestBaseAddr = (uint32_t)(&(MDR_DAC->DAC2_DATA));	
+  	DMA_InitStructure.DMA_CycleSize = localParam->bufMode;							
+  	DMA_InitStructure.DMA_SourceIncSize = DMA_SourceIncHalfword;				    
+  	DMA_InitStructure.DMA_DestIncSize = DMA_DestIncNo;				              
+  	DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;     
+  	DMA_InitStructure.DMA_NumContinuous = DMA_Transfers_32;				          
+  	DMA_InitStructure.DMA_SourceProtCtrl = DMA_SourcePrivileged;			      
+  	DMA_InitStructure.DMA_DestProtCtrl = DMA_DestPrivileged;			          
+	DMA_InitStructure.DMA_Mode = DMA_Mode_Basic;							              
   
-  DMA_Channel_InitStructure.DMA_PriCtrlData = &DMA_InitStructure;
-  DMA_Channel_InitStructure.DMA_Priority = DMA_Priority_Default;
-  DMA_Channel_InitStructure.DMA_UseBurst = DMA_BurstClear;
-  DMA_Channel_InitStructure.DMA_SelectDataStructure = DMA_CTRL_DATA_PRIMARY;
+	DMA_Channel_InitStructure.DMA_PriCtrlData = &DMA_InitStructure;
+	DMA_Channel_InitStructure.DMA_Priority = DMA_Priority_Default;
+	DMA_Channel_InitStructure.DMA_UseBurst = DMA_BurstClear;
+	DMA_Channel_InitStructure.DMA_SelectDataStructure = DMA_CTRL_DATA_PRIMARY;
   
-  DMA_Init (DMA_Channel_TIM1, &DMA_Channel_InitStructure);						  
+	DMA_Init (DMA_Channel_TIM1, &DMA_Channel_InitStructure);						  
  
-  MDR_DMA->CHNL_REQ_MASK_CLR = 1 << DMA_Channel_TIM1;
-  MDR_DMA->CHNL_USEBURST_CLR = 1 << DMA_Channel_TIM1;
+	MDR_DMA->CHNL_REQ_MASK_CLR = 1 << DMA_Channel_TIM1;
+	MDR_DMA->CHNL_USEBURST_CLR = 1 << DMA_Channel_TIM1;
  
-  DMA_Cmd (DMA_Channel_TIM1, ENABLE);
+	DMA_Cmd (DMA_Channel_TIM1, ENABLE);
 
-  NVIC_SetPriority (DMA_IRQn, 1); 
+	NVIC_SetPriority (DMA_IRQn, 1); 
 }
 
 //------------------------------------------------------------
@@ -426,6 +427,103 @@ void DMA_ini(void)
 
 }
 
+void WriteStringDMA(char* str)
+{
+	int len;
+	DMA_CtrlDataInitTypeDef DMA_PriCtrlStr;
+	DMA_ChannelInitTypeDef DMA_InitStr;
+	
+	len = strlen(str);
+
+	DMA_DeInit();
+	DMA_StructInit(&DMA_InitStr);
+
+	DMA_PriCtrlStr.DMA_SourceBaseAddr = (uint32_t)str;
+	DMA_PriCtrlStr.DMA_DestBaseAddr = (uint32_t)(&(MDR_UART1->DR));
+	DMA_PriCtrlStr.DMA_SourceIncSize = DMA_SourceIncByte;
+	DMA_PriCtrlStr.DMA_DestIncSize = DMA_DestIncNo;
+	DMA_PriCtrlStr.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
+	DMA_PriCtrlStr.DMA_Mode = DMA_Mode_Basic;
+	DMA_PriCtrlStr.DMA_CycleSize = len;
+	DMA_PriCtrlStr.DMA_NumContinuous = DMA_Transfers_1;
+	DMA_PriCtrlStr.DMA_SourceProtCtrl = DMA_SourcePrivileged;
+	DMA_PriCtrlStr.DMA_DestProtCtrl = DMA_DestPrivileged;
+		
+	DMA_InitStr.DMA_PriCtrlData = &DMA_PriCtrlStr;
+	DMA_InitStr.DMA_Priority = DMA_Priority_Default;
+	DMA_InitStr.DMA_UseBurst = DMA_BurstClear;
+	DMA_InitStr.DMA_SelectDataStructure = DMA_CTRL_DATA_PRIMARY;
+
+  	DMA_Init(DMA_Channel_UART1_TX, &DMA_InitStr);
+
+	while ((DMA_GetFlagStatus(DMA_Channel_UART1_TX, DMA_FLAG_CHNL_ENA ))); // проверка конца передачи
+}
+
+
+//------------------------------------------------------------------------------------
+// Читает строку из последовательного порта
+// буфер под стоку должен быть на 1 больше чем допустимая длина строки, для записи '\0'
+// Конец сообщения идентифицируется по '\n'.
+// Возвращает:
+//    - строка завершенная '\0', конец сообщения идентифицируется по '\n'
+//	  "" - пустая строка если буфер строки заполнен полностью и не содержит '\n'
+//------------------------------------------------------------------------------------
+int ReadStringDMA(char* buf, int bufSize)
+{	
+	DMA_CtrlDataInitTypeDef DMA_PriCtrlStr;
+	DMA_ChannelInitTypeDef DMA_InitStr;
+	
+	uint8_t idx = 0;
+
+	// ASCI символ которого гарантировано не должно быть с сообщении
+	const char unSym = 252;
+	buf[bufSize-2] = unSym; 
+
+	DMA_DeInit();
+	DMA_StructInit(&DMA_InitStr);
+	
+	DMA_PriCtrlStr.DMA_SourceBaseAddr = (uint32_t)(&(MDR_UART1->DR));
+  	DMA_PriCtrlStr.DMA_DestBaseAddr = (uint32_t)buf;
+  	DMA_PriCtrlStr.DMA_SourceIncSize = DMA_SourceIncNo;
+  	DMA_PriCtrlStr.DMA_DestIncSize = DMA_DestIncByte;
+  	DMA_PriCtrlStr.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
+ 	DMA_PriCtrlStr.DMA_Mode = DMA_Mode_Basic;
+ 	DMA_PriCtrlStr.DMA_CycleSize = bufSize - 1;
+	DMA_PriCtrlStr.DMA_NumContinuous = DMA_Transfers_1;
+  	DMA_PriCtrlStr.DMA_SourceProtCtrl = DMA_SourcePrivileged;
+  	DMA_PriCtrlStr.DMA_DestProtCtrl = DMA_DestPrivileged;
+	
+	DMA_InitStr.DMA_PriCtrlData = &DMA_PriCtrlStr;
+  	DMA_InitStr.DMA_Priority = DMA_Priority_High;
+  	DMA_InitStr.DMA_UseBurst = DMA_BurstClear;
+  	DMA_InitStr.DMA_SelectDataStructure = DMA_CTRL_DATA_PRIMARY;
+
+  	DMA_Init(DMA_Channel_UART1_RX, &DMA_InitStr);
+	
+	// проверка конца приема нажатием enter
+	while(1)
+	{
+		// постоянный поиск завершения строки '\n' как признак конца посылки		
+		for (idx = 0; idx < bufSize-1; idx++)
+		{
+			if (buf[idx] == 13) // enter
+				{
+					buf[idx + 1] = '\0';
+					return idx + 1;
+				}
+			// если последний символ изменен, значит буфер заполнен полностью и нету признака конца посылки			
+			if (buf[bufSize-2] != unSym 
+				&& buf[bufSize-2] != '\n') // '\n' в конце - корректный вариант, просто до него неуспел добраться поиск				
+			{
+				// возврат пустой строки как признак ошибки
+				buf[0] = '\0';				
+				return 0;
+			}
+		}
+	}	
+
+}
+
 //------------------------------------------------------------
 // Запуск DMA на прием(UART1)
 //------------------------------------------------------------
@@ -467,6 +565,8 @@ uint8_t DMA_RX_start(uint8_t* buf, uint32_t buf_size)
 	DMA_ChannelInitTypeDef DMA_InitStr;
 	uint8_t idx = 0;
 	
+	buf[buf_size-1] = 252;
+
 	DMA_DeInit();
 	DMA_StructInit(&DMA_InitStr);
 	
@@ -476,7 +576,7 @@ uint8_t DMA_RX_start(uint8_t* buf, uint32_t buf_size)
   DMA_PriCtrlStr.DMA_DestIncSize = DMA_DestIncByte;
   DMA_PriCtrlStr.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
   DMA_PriCtrlStr.DMA_Mode = DMA_Mode_Basic;
-  DMA_PriCtrlStr.DMA_CycleSize = buf_size;
+  DMA_PriCtrlStr.DMA_CycleSize = buf_size-1;
   DMA_PriCtrlStr.DMA_NumContinuous = DMA_Transfers_1;
   DMA_PriCtrlStr.DMA_SourceProtCtrl = DMA_SourcePrivileged;
   DMA_PriCtrlStr.DMA_DestProtCtrl = DMA_DestPrivileged;
@@ -491,13 +591,15 @@ uint8_t DMA_RX_start(uint8_t* buf, uint32_t buf_size)
 	// проверка конца приема нажатием enter
 	while(1)
 	{
-		for (idx = 0; idx < buf_size; idx++)
+		for (idx = 0; idx < buf_size - 1; idx++)
 		{
-			if (buf[idx] == 13)  // enter
-				return idx;
+			if (buf[idx] == 13) // enter
+				{
+					buf[idx + 1] = '\0';
+					return idx + 1;
+				}
 		}
-	}
-	
+	}	
 	//while ((DMA_GetFlagStatus(DMA_Channel_UART1_RX, DMA_FLAG_CHNL_ENA ))); // проверка конца приема
 }
 

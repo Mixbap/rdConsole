@@ -9,6 +9,7 @@
 #ifndef CONSOLE_H
 #define CONSOLE_H
 #include <stdint.h>
+#include "ini.h"
 typedef enum 
 {
 	successNoError = 0, // нет ошибки
@@ -31,17 +32,17 @@ uint8_t deinterpret(uint8_t value);
 uint32_t dataInterpret(uint8_t* data, uint8_t idx);
 uint8_t dataDeinterpret(uint8_t* data, uint32_t value);
 
-void selectMode(void);
-void typeModHandler(void);
-void freqModHandler(void);
-void bufModeHandler(void);
-void amplModHandler(void);
-void freqBwHandler(void);
-void limitAccHandler(void);
-void coefAdjHandler(void);
-void constModeHandler(void);
+int selectMode(uint32_t* mode);
+int typeModHandler(uint32_t* typeMod);
+int freqModHandler(uint32_t* freqMod);
+int bufModeHandler(uint32_t* bufMode);
+int amplModHandler(uint32_t* amplMode, uint32_t typeMod);
+int freqBwHandler(uint8_t* freqBw0Param, uint8_t* freqBw1Param);
+int limitAccHandler(uint32_t* limitAcc);
+int coefAdjHandler(uint32_t* coefAdj);
+int constModeHandler(uint32_t* constMode);
 
-void getConfig(void);
+void printConfig(rdParam param);
 
 void printError(typeError localError);
 void processError(void);
