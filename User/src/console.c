@@ -22,13 +22,13 @@ typeError error;
 //--------------------------------------------------------------
 void runConsole(void)
 {
-	uint8_t act = 1;
+	uint8_t active = 1;
 	char defConf[] = "Set default configuraton succesfull!\r\n";
 	char exit[] = "Exit terminal succesfull!\r\n";
 	DMA_ini(); 							// Инициализация DMA
 	UART1_DMA_ini(); 	// Инициализация UART1+DMA TX RX
 	
-	while (act)
+	while (active)
 	{
 		printMenu();
 		
@@ -71,7 +71,7 @@ void runConsole(void)
 				break;	
 			case 12:
 				WriteStringDMA(exit);
-				act = 0;
+				active = 0;
 				break;		
 			default:
 				WriteStringDMA(unsupCommand);
