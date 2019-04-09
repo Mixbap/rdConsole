@@ -164,7 +164,7 @@ uint32_t readData(int* isNumber)
 	ReadStringDMA(data, bufSize);
 	WriteStringDMA(transferLine);	
 	*isNumber = 1;
-	for (i = 0 ; data[i] != '\t'; i++)
+	for (i = 0 ; data[i] != '\0'; i++)
 	{
 		if (data[i] < '0' || data[i]>'9')
 			{
