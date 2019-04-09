@@ -6,6 +6,7 @@
 // Компилятор:  Armcc 5.06 update 3 из комплекта Keil uVision 5.21.1.0 
 // ***********************************************************************************
 #include <stdlib.h>
+#include <stdio.h>
 #include "console.h"
 #include "math.h"
 #include "ini.h"
@@ -121,6 +122,25 @@ void WriteLine(char Message[])
 	WriteStringDMA(transferLine);
 }
 
+//-----------------------------------------------------------------------------
+// Выводит целое число в порт
+//-----------------------------------------------------------------------------
+void WriteInt(uint32_t value)
+{
+	char data[17] = {0};
+	sprintf(data, "%d", value);
+	WriteStringDMA(data);
+}
+
+//-----------------------------------------------------------------------------
+// Выводит целое число в порт с переводом строки в конце
+//-----------------------------------------------------------------------------
+void WriteIntNl(uint32_t value)
+{
+	WriteInt(value);
+	WriteStringDMA(transferLine);
+}
+
 //--------------------------------------------------------------
 // Вывод меню
 //--------------------------------------------------------------
@@ -152,9 +172,8 @@ uint32_t readData(void)
 	uint32_t res = 0;
 	
 	ReadStringDMA(data, bufSize);
-	WriteStringDMA(transferLine);
-
-	res = atoi((char*)data);			
+	WriteStringDMA(transferLine);	
+	res = atoi(data);			
 	//res = dataInterpret(data, idx);	
 	return res;
 }
@@ -348,9 +367,7 @@ int typeModHandler(uint32_t* typeMod)
 //--------------------------------------------------------------
 int freqModHandler(uint32_t* freqMod)
 {
-	uint32_t result;
-	uint8_t size;
-	uint8_t data[5] = {0};
+	uint32_t result;	
 	char freq[] = "Enter frequency (Hz):\r\n";
 	char freqPrint[] = "Frequency of the modulating voltage: ";
 	
@@ -375,12 +392,8 @@ int freqModHandler(uint32_t* freqMod)
 			*freqMod = result;
 			
 			// Вывод freqMod
-			WriteStringDMA(freqPrint);		
-			// TODO переделать перевод числа в строку	
-			size = dataDeinterpret(data, result);
-			DMA_TX_start(data, size);
-
-			WriteStringDMA(transferLine);			
+			WriteStringDMA(freqPrint);
+			WriteIntNl(result);				
 			return result;
 		}
 	}
@@ -391,9 +404,7 @@ int freqModHandler(uint32_t* freqMod)
 //--------------------------------------------------------------
 int bufModeHandler(uint32_t* bufMode)
 {
-	uint32_t result;
-	uint8_t size;
-	uint8_t data[5] = {0};
+	uint32_t result;	
 	char modeBuf[] = "Enter the buffer size:\r\n";
 	char modeBufPrint[] = "Size of the buffer of counting: ";
 	
@@ -419,12 +430,7 @@ int bufModeHandler(uint32_t* bufMode)
 			
 			// Вывод bufMode
 			WriteStringDMA(modeBufPrint);
-
-			// TODO переделать перевод числа в строку
-			size = dataDeinterpret(data, result);
-			DMA_TX_start(data, size);
-
-			WriteStringDMA(transferLine);			
+			WriteIntNl(result);					
 			return result;
 		}
 	}
@@ -437,8 +443,6 @@ int bufModeHandler(uint32_t* bufMode)
 int amplModHandler(uint32_t* amplMod, uint32_t typeMod)
 {
 	uint32_t result;
-	uint8_t size;
-	uint8_t data[5] = {0};
 	char modeAmp[] = "Enter amplitude:\r\n";
 	char modeAmpPrint[] = "Maximum amplitude of the modulating voltage: ";
 	
@@ -463,12 +467,7 @@ int amplModHandler(uint32_t* amplMod, uint32_t typeMod)
 			*amplMod = result;
 			// Вывод amplMod
 			WriteStringDMA(modeAmpPrint);		
-
-			// TODO переделать перевод числа в строку
-			size = dataDeinterpret(data, result);
-			DMA_TX_start(data, size);
-
-			WriteStringDMA(transferLine);			
+			WriteIntNl(result);		
 			return result;
 		}			
 	}
@@ -480,8 +479,6 @@ int amplModHandler(uint32_t* amplMod, uint32_t typeMod)
 int constModeHandler(uint32_t* constModeParam)
 {
 	uint32_t result;
-	uint8_t size;
-	uint8_t data[5] = {0};
 	char constMode[] = "Enter constant:\r\n";
 	char constModePrint[] = "Constant of the modulating voltage: ";
 	
@@ -503,14 +500,10 @@ int constModeHandler(uint32_t* constModeParam)
 		}
 		else
 		{
-			*constModeParam = result;
-			
+			*constModeParam = result;			
 			// Вывод constMode
 			WriteStringDMA(constModePrint);			
-			size = dataDeinterpret(data, result);
-			DMA_TX_start(data, size);
-
-			WriteStringDMA(transferLine);			
+			WriteIntNl(result);			
 			return result;
 		}
 	}
@@ -522,8 +515,6 @@ int constModeHandler(uint32_t* constModeParam)
 int freqBwHandler(uint8_t* freqBw0Param, uint8_t* freqBw1Param)
 {
 	uint32_t result0, result1;
-	uint8_t size;
-	uint8_t data[5] = {0};
 	char freqBw0[] = "Set lower bound:\r\n";
 	char freqBw1[] = "Set upper bound:\r\n";
 	char freqBw[] = "Bandwidth of frequency of beats: [";
@@ -560,16 +551,10 @@ int freqBwHandler(uint8_t* freqBw0Param, uint8_t* freqBw1Param)
 			
 			// Вывод freqBw
 			WriteStringDMA(freqBw);
-
-			size = dataDeinterpret(data, result0);
-			DMA_TX_start(data, size);
+			WriteInt(result0);
 			WriteStringDMA(freqBwPoint);	
-
-			size = dataDeinterpret(data, result1);
-			DMA_TX_start(data, size);
-
+			WriteInt(result1);
 			WriteStringDMA(freqBwScob);
-
 			WriteStringDMA(transferLine);			
 			return result0;
 		}
@@ -581,9 +566,7 @@ int freqBwHandler(uint8_t* freqBw0Param, uint8_t* freqBw1Param)
 //--------------------------------------------------------------
 int limitAccHandler(uint32_t* limitAcc)
 {
-	uint8_t size;
 	uint32_t result;
-	uint8_t data[5] = {0};
 	char limit[] = "Enter limit accumulation:\r\n";
 	char limitPrint[] = "Limit accumulation: ";
 	
@@ -602,11 +585,7 @@ int limitAccHandler(uint32_t* limitAcc)
 		*limitAcc = result;
 		// Вывод limitAcc
 		WriteStringDMA(limitPrint);	
-
-		size = dataDeinterpret(data, result);
-		DMA_TX_start(data, size);
-
-		WriteStringDMA(transferLine);		
+		WriteIntNl(result);	
 		return result;
 	}
 }
@@ -617,8 +596,6 @@ int limitAccHandler(uint32_t* limitAcc)
 int coefAdjHandler(uint32_t* coefAdj)
 {
 	uint32_t result;
-	uint8_t size;
-	uint8_t data[5] = {0};
 	char paramAdj[] = "Enter adjustment coefficient:\r\n";
 	char coefPrint[] = "Adjustment coefficient: ";
 	
@@ -644,11 +621,7 @@ int coefAdjHandler(uint32_t* coefAdj)
 			
 			// Вывод coefAdj
 			WriteStringDMA(coefPrint);
-
-			size = dataDeinterpret(data, result);
-			DMA_TX_start(data, size);
-
-			WriteStringDMA(transferLine);
+			WriteIntNl(result);
 			return result;
 		}
 	}
@@ -659,9 +632,6 @@ int coefAdjHandler(uint32_t* coefAdj)
 //--------------------------------------------------------------
 void printConfig(rdParam localParam)
 {
-	uint8_t data[5] = {0};
-	uint8_t size;
-
 	char mode[] = "Type of the modulating voltage:              ";
 	char freq[] = "Frequency of the modulating voltage:         ";
 	char modeBuf[] = "Size of the buffer of counting:              ";
@@ -675,58 +645,39 @@ void printConfig(rdParam localParam)
 
 	// Вывод typeMod
 	WriteStringDMA(mode);
-	size = dataDeinterpret(data, (uint32_t)localParam.typeMod);
-	DMA_TX_start(data, size);
-	WriteStringDMA(transferLine);
+	WriteIntNl(localParam.typeMod);
 
 	// Вывод freqMod
 	WriteStringDMA(freq);
-
-	size = dataDeinterpret(data, localParam.freqMod);
-	DMA_TX_start(data, size);
-
-	WriteStringDMA(transferLine);
+	WriteIntNl(localParam.freqMod);
 	
 	// Вывод bufMode
 	WriteStringDMA(modeBuf);
-	size = dataDeinterpret(data, localParam.bufMode);
-	DMA_TX_start(data, size);
-	WriteStringDMA(transferLine);
+	WriteIntNl(localParam.bufMode);	
 	
 	// Вывод amplMod
 	WriteStringDMA(modeAmp);
-	size = dataDeinterpret(data, localParam.amplMod);
-	DMA_TX_start(data, size);
-	WriteStringDMA(transferLine);
+	WriteIntNl(localParam.amplMod);
 	
 	// Вывод constMode
 	WriteStringDMA(constMode);
-	size = dataDeinterpret(data, localParam.constMode);
-	DMA_TX_start(data, size);
-	WriteStringDMA(transferLine);
+	WriteIntNl(localParam.constMode);
 	
 	// Вывод freqBw
 	WriteStringDMA(freqBw);
-	size = dataDeinterpret(data, localParam.freqBw0);
-	DMA_TX_start(data, size);
+	WriteInt(localParam.freqBw0);
 	WriteStringDMA(freqBwPoint);
-	size = dataDeinterpret(data, localParam.freqBw1);
-	DMA_TX_start(data, size);
+	WriteInt(localParam.freqBw1);
 	WriteStringDMA(freqBwScob);
 	WriteStringDMA(transferLine);
 		
 	// Вывод limitAcc
 	WriteStringDMA(limit);	
-	size = dataDeinterpret(data, localParam.limitAcc);
-	DMA_TX_start(data, size);
-	WriteStringDMA(transferLine);
+	WriteIntNl(localParam.limitAcc);
 	
 	// Вывод coefAdj
 	WriteStringDMA(coef);
-	size = dataDeinterpret(data, localParam.coefAdj);
-	DMA_TX_start(data, size);
-	WriteStringDMA(transferLine);
-	
+	WriteIntNl(localParam.coefAdj);	
 }
 
 //--------------------------------------------------------------
