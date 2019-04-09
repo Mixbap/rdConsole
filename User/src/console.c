@@ -166,11 +166,13 @@ uint32_t readData(int* isNumber)
 	*isNumber = 1;
 	for (i = 0 ; data[i] != '\0'; i++)
 	{
-		if (data[i] < '0' || data[i]>'9')
+
+		if ( (data[i] < '0' || data[i] > '9') && (data[i]!='\r' && data[i] != '\n') ) 
 			{
 				*isNumber = 0;
 				break;
 			}
+
 	}
 	res = atoi(data);				
 	return res;
