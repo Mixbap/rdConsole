@@ -26,7 +26,7 @@ typedef enum
 
 void runConsole(rdParam *localParam);
 void printMenu(void);
-uint32_t readData(void);
+uint32_t readData(int* isNumber);
 uint8_t interpret(uint8_t value);
 uint8_t deinterpret(uint8_t value);
 uint32_t dataInterpret(uint8_t* data, uint8_t idx);

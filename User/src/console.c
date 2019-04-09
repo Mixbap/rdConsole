@@ -24,22 +24,31 @@ typeError error;
 void runConsole(rdParam* localParam)
 {
 	uint8_t active = 1;
+	uint32_t menuItem;
+	int isNumber;
 	char defConf[] = "Set default configuraton succesfull!\r\n";
 	char exit[] = "Exit terminal succesfull!\r\n";
 	char unsupCommand[] = "Unsupported command!\r\n\n";
 	DMA_ini(); 							// Инициализация DMA
 	UART1_DMA_ini(); 	// Инициализация UART1+DMA TX RX
-	
+
 	while (active)
 	{
 		printMenu();
-		
-		// Обработчик команд меню 
-		switch (readData())
+
+		menuItem = readData(&isNumber);
+		if (isNumber == 0)
 		{
-			case 1:				
-				selectMode(&(localParam->mode));					
-				break;				
+			printError(incorInp);		
+		}
+		else
+		{
+			// Обработчик команд меню
+			switch (menuItem)
+			{
+			case 1:
+				selectMode(&(localParam->mode));
+				break;
 			case 2:
 				typeModHandler(&(localParam->typeMod));
 				break;
@@ -51,7 +60,7 @@ void runConsole(rdParam* localParam)
 				break;
 			case 5:
 				amplModHandler(&(localParam->amplMod), localParam->typeMod);
-				break;				
+				break;
 			case 6:
 				constModeHandler(&(localParam->constMode));
 				break;
@@ -68,18 +77,18 @@ void runConsole(rdParam* localParam)
 				rdParamDefIni(localParam);
 				WriteStringDMA(defConf);
 				printConfig(*localParam);
-				break;	
+				break;
 			case 11:
 				printConfig(*localParam);
-				break;	
+				break;
 			case 12:
 				WriteStringDMA(exit);
 				active = 0;
-				break;		
-			default:
-				WriteStringDMA(unsupCommand);
-				resetError();
 				break;
+			default:
+				WriteStringDMA(unsupCommand);				
+				break;
+			}
 		}
 	}
 
@@ -165,16 +174,25 @@ void printMenu(void)
 //--------------------------------------------------------------
 // Ввод данных
 //--------------------------------------------------------------
-uint32_t readData(void)
+uint32_t readData(int* isNumber)
 {
 	const int bufSize = 21;
 	char data[bufSize] = {0};
+	int i;
 	uint32_t res = 0;
 	
 	ReadStringDMA(data, bufSize);
 	WriteStringDMA(transferLine);	
-	res = atoi(data);			
-	//res = dataInterpret(data, idx);	
+	*isNumber = 1;
+	for (i = 0 ; data[i] != '\t'; i++)
+	{
+		if (data[i] < '0' || data[i]>'9')
+			{
+				*isNumber = 0;
+				break;
+			}
+	}
+	res = atoi(data);				
 	return res;
 }
 
@@ -265,6 +283,7 @@ uint32_t dataInterpret(uint8_t* data, uint8_t idx)
 int selectMode(uint32_t* mode)
 {
 	uint32_t result;
+	int isNumber;
 	char selMode[] = "Select mode:\r\n[1] Radio senser\r\n[2] Distance measurement\r\n";
 	char selModePrint[] = "Mode: ";
 	char senser[] = "Radio senser\r\n";
@@ -274,13 +293,12 @@ int selectMode(uint32_t* mode)
 	{
 		WriteStringDMA(selMode);
 		WriteStringDMA(cursor);		
-		result = readData();
+		result = readData(&isNumber);
 		
 		// Обработка ошибки
-		if (error < 0)
+		if (isNumber == 0)
 		{
-			printError(error);
-			resetError();			
+			printError(incorInp);			
 		}
 		else if ((result < 1) || (result > 2))
 		{			
@@ -311,6 +329,7 @@ int selectMode(uint32_t* mode)
 int typeModHandler(uint32_t* typeMod)
 {
 	uint32_t result;
+	int isNumber;
 	char mode[] = "Type of the modulating voltage:\r\n[1] Sinus\r\n[2] Saw\r\n[3] Triangle\r\n";
 	char modePrint[] = "Type of the modulating voltage: ";
 	char sineMode[] = "[1] Sine";
@@ -322,12 +341,12 @@ int typeModHandler(uint32_t* typeMod)
 		WriteStringDMA(mode);		
 		WriteStringDMA(cursor);
 
-		result = readData();
+		result = readData(&isNumber);
 		
 		// Обработка ошибки
-		if (error < 0)
+		if (isNumber == 0)
 		{
-			processError();				
+			printError(incorInp);				
 		}
 		else if ((result > 3) || (result < 1))
 		{			
@@ -367,7 +386,8 @@ int typeModHandler(uint32_t* typeMod)
 //--------------------------------------------------------------
 int freqModHandler(uint32_t* freqMod)
 {
-	uint32_t result;	
+	uint32_t result;
+	int isNumber;	
 	char freq[] = "Enter frequency (Hz):\r\n";
 	char freqPrint[] = "Frequency of the modulating voltage: ";
 	
@@ -376,12 +396,12 @@ int freqModHandler(uint32_t* freqMod)
 		WriteStringDMA(freq);
 		WriteStringDMA(cursor);
 
-		result = readData();
+		result = readData(&isNumber);
 		
 		// Обработка ошибки
-		if (error < 0)
+		if ( isNumber == 0)
 		{
-			processError();		
+			printError(incorInp);		
 		}
 		else if (result > 200000)
 		{			
@@ -405,6 +425,7 @@ int freqModHandler(uint32_t* freqMod)
 int bufModeHandler(uint32_t* bufMode)
 {
 	uint32_t result;	
+	int isNumber;
 	char modeBuf[] = "Enter the buffer size:\r\n";
 	char modeBufPrint[] = "Size of the buffer of counting: ";
 	
@@ -413,12 +434,12 @@ int bufModeHandler(uint32_t* bufMode)
 		WriteStringDMA(modeBuf);
 		WriteStringDMA(cursor);
 
-		result = readData();
+		result = readData(&isNumber);
 		
 		// Обработка ошибки
-		if (error < 0)
+		if (isNumber == 0)
 		{
-			processError();			
+			printError(incorInp);			
 		}
 		else if (result > 255)
 		{			
@@ -443,6 +464,7 @@ int bufModeHandler(uint32_t* bufMode)
 int amplModHandler(uint32_t* amplMod, uint32_t typeMod)
 {
 	uint32_t result;
+	int isNumber;
 	char modeAmp[] = "Enter amplitude:\r\n";
 	char modeAmpPrint[] = "Maximum amplitude of the modulating voltage: ";
 	
@@ -451,12 +473,12 @@ int amplModHandler(uint32_t* amplMod, uint32_t typeMod)
 		WriteStringDMA(modeAmp);
 		WriteStringDMA(cursor);
 
-		result = readData();
+		result = readData(&isNumber);
 		
 		// Обработка ошибки
-		if (error < 0)
+		if (isNumber == 0)
 		{
-			processError();		
+			printError(incorInp);		
 		}
 		else if (result > (typeMod == 1? 2047 : 4095) )
 		{
@@ -479,6 +501,7 @@ int amplModHandler(uint32_t* amplMod, uint32_t typeMod)
 int constModeHandler(uint32_t* constModeParam)
 {
 	uint32_t result;
+	int isNumber;
 	char constMode[] = "Enter constant:\r\n";
 	char constModePrint[] = "Constant of the modulating voltage: ";
 	
@@ -487,12 +510,12 @@ int constModeHandler(uint32_t* constModeParam)
 		WriteStringDMA(constMode);
 		WriteStringDMA(cursor);
 		
-		result = readData();
+		result = readData(&isNumber);
 		
 		// Обработка ошибки
-		if (error < 0)
+		if (isNumber < 0)
 		{
-			processError();
+			printError(incorInp);
 		}
 		else if (result > 4095)
 		{			
@@ -515,6 +538,7 @@ int constModeHandler(uint32_t* constModeParam)
 int freqBwHandler(uint8_t* freqBw0Param, uint8_t* freqBw1Param)
 {
 	uint32_t result0, result1;
+	int isNumber0, isNumber1;
 	char freqBw0[] = "Set lower bound:\r\n";
 	char freqBw1[] = "Set upper bound:\r\n";
 	char freqBw[] = "Bandwidth of frequency of beats: [";
@@ -525,16 +549,16 @@ int freqBwHandler(uint8_t* freqBw0Param, uint8_t* freqBw1Param)
 	{
 		WriteStringDMA(freqBw0);
 		WriteStringDMA(cursor);		
-		result0 = readData();
+		result0 = readData(&isNumber0);
 		
 		WriteStringDMA(freqBw1);
 		WriteStringDMA(cursor);				
-		result1 = readData();
+		result1 = readData(&isNumber1);
 
 		// Обработка ошибки
-		if (error < 0)
+		if (isNumber0 == 0 || isNumber1 == 0)
 		{
-			processError();		
+			printError(incorInp);		
 		}
 		else if (result0 >= result1)
 		{			
@@ -567,6 +591,7 @@ int freqBwHandler(uint8_t* freqBw0Param, uint8_t* freqBw1Param)
 int limitAccHandler(uint32_t* limitAcc)
 {
 	uint32_t result;
+	int isNumber;
 	char limit[] = "Enter limit accumulation:\r\n";
 	char limitPrint[] = "Limit accumulation: ";
 	
@@ -575,13 +600,13 @@ int limitAccHandler(uint32_t* limitAcc)
 		WriteStringDMA(limit);
 		WriteStringDMA(cursor);
 
-		result = readData();
+		result = readData(&isNumber);
 		
 		// Обработка ошибки
-		if (error < 0)
-			{
-				processError();
-			}
+		if (isNumber == 0)
+		{
+			printError(incorInp);
+		}
 		*limitAcc = result;
 		// Вывод limitAcc
 		WriteStringDMA(limitPrint);	
@@ -596,6 +621,7 @@ int limitAccHandler(uint32_t* limitAcc)
 int coefAdjHandler(uint32_t* coefAdj)
 {
 	uint32_t result;
+	int isNumber;
 	char paramAdj[] = "Enter adjustment coefficient:\r\n";
 	char coefPrint[] = "Adjustment coefficient: ";
 	
@@ -604,12 +630,12 @@ int coefAdjHandler(uint32_t* coefAdj)
 		WriteStringDMA(paramAdj);
 		WriteStringDMA(cursor);
 
-		result = readData();
+		result = readData(&isNumber);
 		
 		// Обработка ошибки
-		if (error < 0)
+		if ( isNumber == 0)
 		{
-			processError();
+			printError(incorInp);
 		}
 		else if (result > 100)
 		{			
