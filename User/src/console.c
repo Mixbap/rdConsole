@@ -13,18 +13,19 @@
 
 char transferLine[] = "\r\n";
 char cursor[] = "\n>> ";
-char unsupCommand[] = "Unsupported command!\r\n\n";
+
 typeError error;
 
 
 //--------------------------------------------------------------
 // Запуск консоли
 //--------------------------------------------------------------
-void runConsole(void)
+void runConsole(rdParam* localParam)
 {
 	uint8_t active = 1;
 	char defConf[] = "Set default configuraton succesfull!\r\n";
 	char exit[] = "Exit terminal succesfull!\r\n";
+	char unsupCommand[] = "Unsupported command!\r\n\n";
 	DMA_ini(); 							// Инициализация DMA
 	UART1_DMA_ini(); 	// Инициализация UART1+DMA TX RX
 	
@@ -36,38 +37,39 @@ void runConsole(void)
 		switch (readData())
 		{
 			case 1:				
-				selectMode(&(param.mode));					
+				selectMode(&(localParam->mode));					
 				break;				
 			case 2:
-				typeModHandler(&(param.typeMod));
+				typeModHandler(&(localParam->typeMod));
 				break;
 			case 3:
-				freqModHandler(&(param.freqMod));
+				freqModHandler(&(localParam->freqMod));
 				break;
 			case 4:
-				bufModeHandler(&(param.bufMode));
+				bufModeHandler(&(localParam->bufMode));
 				break;
 			case 5:
-				amplModHandler(&(param.amplMod), param.typeMod);
+				amplModHandler(&(localParam->amplMod), localParam->typeMod);
 				break;				
 			case 6:
-				constModeHandler(&(param.constMode));
+				constModeHandler(&(localParam->constMode));
 				break;
 			case 7:
-				freqBwHandler(&(param.freqBw0), &(param.freqBw1));
+				freqBwHandler(&(localParam->freqBw0), &(localParam->freqBw1));
 				break;
 			case 8:
-				limitAccHandler(&(param.limitAcc));
+				limitAccHandler(&(localParam->limitAcc));
 				break;
 			case 9:
-				coefAdjHandler(&(param.coefAdj));
+				coefAdjHandler(&(localParam->coefAdj));
 				break;
 			case 10:
-				rdParamDefIni(&param);
+				rdParamDefIni(localParam);
 				WriteStringDMA(defConf);
+				printConfig(*localParam);
 				break;	
 			case 11:
-				printConfig(param);
+				printConfig(*localParam);
 				break;	
 			case 12:
 				WriteStringDMA(exit);
@@ -236,13 +238,10 @@ uint32_t dataInterpret(uint8_t* data, uint8_t idx)
 
 //--------------------------------------------------------------
 // Выбор режима работы
-// 	изменяет режим работы mode при корректном выборе режима, не изменяет в случае ошибки
+// 	изменяет режим работы mode при корректном выборе режима, при некорректном значении повторяет ввод
 //  осуществляет вывод сообщений об ошибке в COM порт
 // Возвращает :
 //  выбранный режим работы (1 или 2)
-//	-1 - некорректный ввод, введено нечисловое значение
-//	-2 - выбран недопустимый режим работы
-//
 //--------------------------------------------------------------
 int selectMode(uint32_t* mode)
 {
@@ -285,6 +284,10 @@ int selectMode(uint32_t* mode)
 
 //--------------------------------------------------------------
 // Задание формы модулирующего напряжения
+// 	изменяет параметр typeMod, при некорректном значении, 
+//  повторный запрос ввода с сообщением об ошибке
+// Возвращает:
+//   Введенное значение
 //--------------------------------------------------------------
 int typeModHandler(uint32_t* typeMod)
 {

@@ -24,7 +24,7 @@ typedef enum
 	selectModeError = -9, // Неверный ввод режима работы
 }typeError;
 
-void runConsole(void);
+void runConsole(rdParam *localParam);
 void printMenu(void);
 uint32_t readData(void);
 uint8_t interpret(uint8_t value);

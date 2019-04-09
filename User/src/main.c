@@ -52,7 +52,7 @@ int main(void)
 		// Проверка выхода из терминала
 		if (flagConsole)
 		{
-			runConsole();
+			runConsole(&param);
 			Modulator_ini(&param);								// Инициализация модулятора
 			TIMER_CAPTURE_ini(); 						// Инициализация таймера в режиме захвата (PC2 XS9 26 pin)
 			NVIC_EnableIRQ(EXT_INT2_IRQn); 	// Разрешение внешних прерываний по PB10 (XS9 23 pin) 
