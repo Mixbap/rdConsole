@@ -12,7 +12,7 @@
 
 // Строка, выводимая на индикатор при инициализации
 //static const char* init_string = "   \xC7\xC0\xCE\"\xCC\xE8\xEB\xE0\xED\xE4\xF0\"";  // ЗАО "Миландр"
-	static const char* init_string = "   \xD4\xC3\xD3\xCF\ \xCD\xC8\xC8\xC8\xD1\ "; //ФГУП НИИИС
+	static const char* init_string = "   \xD4\xC3\xD3\xCF \xCD\xC8\xC8\xC8\xD1 "; //ФГУП НИИИС
 /*
 // Изображение, выводимое на индикатор при инициализации (Эмблема "Миландра")
 static const uint8_t init_image[32] = 
