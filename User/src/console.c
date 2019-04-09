@@ -15,9 +15,6 @@
 char transferLine[] = "\r\n";
 char cursor[] = "\n>> ";
 
-typeError error;
-
-
 //--------------------------------------------------------------
 // Запуск консоли
 //--------------------------------------------------------------
@@ -110,7 +107,6 @@ void WriteString(char Message[])
 			i++;
 		}
 	WriteStringDMA(buf);
-  //DMA_TX_start(Message, sizeof(Message)); 
 }
 
 //--------------------------------------------------------------
@@ -151,28 +147,12 @@ void WriteIntNl(uint32_t value)
 }
 
 //--------------------------------------------------------------
-// Вывод меню
-//--------------------------------------------------------------
-void printMenu(void)
-{	
-	WriteLine("\n\tTerminal of the block of processing of the radio sensor.");
-	WriteLine(" [1] Select mode");
-	WriteLine(" [2] Set type of the modulating voltage");
-	WriteLine(" [3] Set frequency of the modulating voltage");
-	WriteLine(" [4] Set size of the buffer of counting");
-	WriteLine(" [5] Set maximum amplitude of the modulating voltage");
-	WriteLine(" [6] Set constant of the modulating voltage");
-	WriteLine(" [7] Set constant of the modulating voltage");
-	WriteLine(" [8] Set limit accumulation");
-	WriteLine(" [9] Set adjustment coefficient");
-	WriteLine("[10] Set default configuration");
-	WriteLine("[11] Get configuration");
-	WriteLine("[12] Exit terminal");
-	WriteString("\r\n>> ");
-}
-
-//--------------------------------------------------------------
-// Ввод данных
+// Считывает из порта целое число,
+//  isNumber - флаг того было ли введено число, 
+//    0 - присутствовали символы отличные от цефр
+//    1 - во вводе присутствовали только цифры, число было корректно считано
+// Возвращает:
+//   Считанное из порта число
 //--------------------------------------------------------------
 uint32_t readData(int* isNumber)
 {
@@ -197,80 +177,24 @@ uint32_t readData(int* isNumber)
 }
 
 //--------------------------------------------------------------
-// Интерпретатор ASCII цифр
+// Вывод меню
 //--------------------------------------------------------------
-uint8_t interpret(uint8_t value)
-{
-
-	if (value >= '0' && value <= '9')
-		return value - '0';
-	else
-	{
-		error = incorInp;
-		return value;
-	}
-}
-
-//--------------------------------------------------------------
-// Деинтерпретатор ASCII цифр
-//--------------------------------------------------------------
-uint8_t deinterpret(uint8_t value)
-{
-	if (value < 10)
-		return value + '0';
-	else
-		return value;
-}
-
-//--------------------------------------------------------------
-// Деинтерпретатор данных
-//--------------------------------------------------------------
-uint8_t dataDeinterpret(uint8_t* data, uint32_t value)
-{
-	uint8_t idx = 0, i = 0;
-	int ceil;
-	
-	// Размер данных
-	while (!idx)
-	{
-		ceil = (int)(value/pow(10, i));
-		if (ceil == 0)
-			idx = i;
-		
-		i++;
-	}
-	
-	// Получение массива данных
-	for (i = 0; i < idx; i++)
-	{
-		ceil = (int)(value/pow(10, idx-1-i));
-		data[i] = deinterpret((uint8_t)ceil);
-		value = value - ((uint32_t)ceil*(uint32_t)pow(10, idx-1-i));
-	}
-	return idx;
-}
-
-//--------------------------------------------------------------
-// Интерпретатор входных данных
-//--------------------------------------------------------------
-uint32_t dataInterpret(uint8_t* data, uint8_t idx)
-{
-	uint8_t i = 0;
-	uint32_t result = 0;
-	
-	// Интрепретация массива данных по ASCII
-	for (i = 0; i < idx; i++)
-	{
-		data[i] = interpret(data[i]);
-	}
-
-	// Интерпретация целой части
-	for (i = 0; i < idx; i++)
-	{
-		result = result + (data[i] * (uint32_t)pow(10, idx - 1 - i));
-	}
-
-	return result;
+void printMenu(void)
+{	
+	WriteLine("\n\tTerminal of the block of processing of the radio sensor.");
+	WriteLine(" [1] Select mode");
+	WriteLine(" [2] Set type of the modulating voltage");
+	WriteLine(" [3] Set frequency of the modulating voltage");
+	WriteLine(" [4] Set size of the buffer of counting");
+	WriteLine(" [5] Set maximum amplitude of the modulating voltage");
+	WriteLine(" [6] Set constant of the modulating voltage");
+	WriteLine(" [7] Set constant of the modulating voltage");
+	WriteLine(" [8] Set limit accumulation");
+	WriteLine(" [9] Set adjustment coefficient");
+	WriteLine("[10] Set default configuration");
+	WriteLine("[11] Get configuration");
+	WriteLine("[12] Exit terminal");
+	WriteString("\r\n>> ");
 }
 
 //--------------------------------------------------------------
@@ -707,7 +631,7 @@ void printConfig(rdParam localParam)
 }
 
 //--------------------------------------------------------------
-// Обработчик ошибок
+// Вывод сообщения об ошибке
 //--------------------------------------------------------------
 void  printError(typeError localError)
 {
@@ -751,19 +675,6 @@ void  printError(typeError localError)
 			WriteStringDMA(selectModeErrorArr);
 			break;
 	}
-	
-	//error = 0;
-}
-
-void processError(void)
-{
-	printError(error);
-	resetError();
-}
-
-void resetError(void)
-{
-	error = successNoError;
 }
 
 

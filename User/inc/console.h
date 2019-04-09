@@ -26,11 +26,13 @@ typedef enum
 
 void runConsole(rdParam *localParam);
 void printMenu(void);
+
+void WriteString(char Message[]);
+void WriteLine(char Message[]);
+void WriteInt(uint32_t value);
+void WriteIntNl(uint32_t value);
+
 uint32_t readData(int* isNumber);
-uint8_t interpret(uint8_t value);
-uint8_t deinterpret(uint8_t value);
-uint32_t dataInterpret(uint8_t* data, uint8_t idx);
-uint8_t dataDeinterpret(uint8_t* data, uint32_t value);
 
 int selectMode(uint32_t* mode);
 int typeModHandler(uint32_t* typeMod);
@@ -45,7 +47,5 @@ int constModeHandler(uint32_t* constMode);
 void printConfig(rdParam param);
 
 void printError(typeError localError);
-void processError(void);
-void resetError(void);
 #endif
 
