@@ -11,8 +11,8 @@
 #include <stdint.h>
 
 extern volatile uint16_t RD;
-extern uint8_t Flag_IRQ;
-extern uint8_t flagConsole;
+extern volatile uint8_t Flag_IRQ;
+extern volatile uint8_t flagConsole;
 
 extern void DMA_IRQHandler(void);
 extern void EXT_INT2_IRQHandler(void);
