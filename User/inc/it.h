@@ -14,6 +14,8 @@ extern volatile uint16_t RD;
 extern volatile uint8_t Flag_IRQ;
 extern volatile uint8_t flagConsole;
 
+extern volatile uint32_t bufMode;
+
 extern void DMA_IRQHandler(void);
 extern void EXT_INT2_IRQHandler(void);
 

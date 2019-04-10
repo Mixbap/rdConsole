@@ -23,6 +23,7 @@ int main(void)
 	uint32_t n = 0;
 
 	rdParamDefIni(&param);		// Инициализация параметров блока по умолчанию
+	bufMode = param.bufMode;
 	CLK_80_ini(); 			// Инициализация CLK = 80 MHz от HSE
 	
 	#ifdef IK_PORT
@@ -39,6 +40,7 @@ int main(void)
 	//LCD_distance_print(52); // Вывод дальности на ЖКИ
 	
 	Modulator_ini(&param);	// Инициализация модулятора
+
 	TIMER_CAPTURE_ini();// Инициализация таймера в режиме захвата (PC2 XS9 26 pin)
 	
 	NVIC_EnableIRQ(EXT_INT2_IRQn); // Разрешение внешних прерываний по PB10 (XS9 23 pin)  
@@ -53,6 +55,7 @@ int main(void)
 		if (flagConsole)
 		{
 			runConsole(&param);
+			bufMode = param.bufMode;
 			Modulator_ini(&param);								// Инициализация модулятора
 			TIMER_CAPTURE_ini(); 						// Инициализация таймера в режиме захвата (PC2 XS9 26 pin)
 			NVIC_EnableIRQ(EXT_INT2_IRQn); 	// Разрешение внешних прерываний по PB10 (XS9 23 pin) 
@@ -68,6 +71,7 @@ int main(void)
 		}		
 	}
 }
+
 
 //------------------------------------------------------------
 // Проверка попадания в пороги (выдача ИК)
@@ -114,6 +118,8 @@ void checkLimits(int localRD, uint32_t *n_ptr)
 		*n_ptr = 0;
 	}
 }
+
+
 
 //------------------------------------------------------------
 // Режим измерения дальности

@@ -13,6 +13,8 @@ volatile uint16_t  RD = 0;
 volatile uint8_t Flag_IRQ = 0;
 volatile uint8_t flagConsole = 0;
 
+volatile uint32_t bufMode;
+
 volatile uint8_t firstIrq = 0;
 
 //------------------------------------------------------------
@@ -21,7 +23,7 @@ volatile uint8_t firstIrq = 0;
 void DMA_IRQHandler (void)
 {
 	Flag_IRQ = 1;
-  	DMA_InitStructure.DMA_CycleSize = param.bufMode;
+  	DMA_InitStructure.DMA_CycleSize = bufMode;
   	DMA_Init (DMA_Channel_TIM1, &DMA_Channel_InitStructure);
 	
 	RD = RD_TIMER->CNT;
