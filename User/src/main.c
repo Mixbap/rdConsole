@@ -11,11 +11,10 @@
 #include "console.h"
 #include "main.h"
 #include "config.h"
-#define DISTANCE_VALUE 3
 
 uint32_t countStartLCD = 0;
-uint16_t distanceArr[DISTANCE_VALUE];
-uint8_t indDistance = 0;
+
+
 int distance = 0;
 
 int main(void)
@@ -126,8 +125,21 @@ void checkLimits(int localRD, uint32_t *n_ptr)
 //------------------------------------------------------------
 void distanceMode(void)
 {
-	uint32_t i;
-	uint32_t result = 0;
+	const int WindowSize = 3;
+
+	static uint16_t distanceArr[WindowSize] = {0};
+	static unsigned int indDistance = 0;
+	static uint32_t sum = 0;
+
+	sum -= distanceArr[indDistance];
+	sum += RD;
+	distanceArr[indDistance] = RD;
+	distance = sum / WindowSize;
+	indDistance++;
+	if (indDistance == WindowSize)
+		indDistance = 0;
+	//indDistance = indDistance % WindowSize;
+/*
 	// Заполнение окна
 	distanceArr[indDistance] = RD;
 	indDistance++;
@@ -140,7 +152,8 @@ void distanceMode(void)
 		result = result + distanceArr[i]; 
 	}
 	distance = (int)(result/DISTANCE_VALUE);
-	/*
+*/
+		/*
 	// Вывод на ЖКИ
 	if (countStartLCD > 5000)
 	{
