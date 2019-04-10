@@ -9,5 +9,5 @@
 #define MAIN_H
 #include <stdint.h>
 void checkLimits(int localRD, uint32_t* n_ptr);
-void distanceMode(void);
+int distanceMode(uint16_t localRD);
 #endif

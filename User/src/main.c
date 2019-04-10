@@ -15,11 +15,12 @@
 uint32_t countStartLCD = 0;
 
 
-int distance = 0;
+
 
 int main(void)
 {
 	uint32_t n = 0;
+	int distance = 0;
 
 	rdParamDefIni(&param);		// Инициализация параметров блока по умолчанию
 	bufMode = param.bufMode;
@@ -66,7 +67,7 @@ int main(void)
 			if 	(param.mode == 1)
 				checkLimits(RD, &n);// Проверка попадания в пороги (выдача ИК)
 			else if (param.mode == 2)
-				distanceMode(); // Режим измерения дальности
+				distance = distanceMode(RD); // Режим измерения дальности
 		}		
 	}
 }
@@ -123,36 +124,23 @@ void checkLimits(int localRD, uint32_t *n_ptr)
 //------------------------------------------------------------
 // Режим измерения дальности
 //------------------------------------------------------------
-void distanceMode(void)
+int distanceMode(uint16_t localRD)
 {
 	const int WindowSize = 3;
-
+	int distance;
 	static uint16_t distanceArr[WindowSize] = {0};
 	static unsigned int indDistance = 0;
 	static uint32_t sum = 0;
 
 	sum -= distanceArr[indDistance];
-	sum += RD;
-	distanceArr[indDistance] = RD;
-	distance = sum / WindowSize;
+	sum += localRD;
+	distanceArr[indDistance] = localRD;
+	distance = sum / WindowSize;	
 	indDistance++;
 	if (indDistance == WindowSize)
 		indDistance = 0;
 	//indDistance = indDistance % WindowSize;
-/*
-	// Заполнение окна
-	distanceArr[indDistance] = RD;
-	indDistance++;
-	if (indDistance == DISTANCE_VALUE)
-		indDistance = 0;
-	
-	// Вычисление дальности
-	for (i = 0; i < DISTANCE_VALUE; i++)
-	{
-		result = result + distanceArr[i]; 
-	}
-	distance = (int)(result/DISTANCE_VALUE);
-*/
+	return distance;
 		/*
 	// Вывод на ЖКИ
 	if (countStartLCD > 5000)
