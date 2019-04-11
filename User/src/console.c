@@ -65,20 +65,24 @@ void runConsole(rdParam* localParam)
 				freqBwHandler(&(localParam->freqBw0), &(localParam->freqBw1));
 				break;
 			case 8:
-				limitAccHandler(&(localParam->limitAcc));
+				freqBwRealHandler(&(localParam->freqBw0), &(localParam->freqBw1), 
+									localParam->freqMod, localParam->coefAdj);
 				break;
 			case 9:
-				coefAdjHandler(&(localParam->coefAdj));
+				limitAccHandler(&(localParam->limitAcc));
 				break;
 			case 10:
+				coefAdjHandler(&(localParam->coefAdj));
+				break;
+			case 11:
 				rdParamDefIni(localParam);
 				WriteStringDMA(defConf);
 				printConfig(*localParam);
 				break;
-			case 11:
+			case 12:
 				printConfig(*localParam);
 				break;
-			case 12:
+			case 13:
 				WriteStringDMA(exit);
 				active = 0;
 				break;
@@ -179,6 +183,38 @@ uint32_t readData(int* isNumber)
 }
 
 //--------------------------------------------------------------
+// Считывает из порта вещественное число,
+//  isNumber - флаг того было ли введено число, 
+//    0 - присутствовали символы отличные от цефр
+//    1 - во вводе присутствовали только цифры, число было корректно считано
+// Возвращает:
+//   Считанное из порта число
+//--------------------------------------------------------------
+float readDataFloat(int* isNumber)
+{
+	const int bufSize = 21;
+	char data[bufSize] = {0};
+	int i;
+	float res = 0;
+	
+	ReadStringDMA(data, bufSize);
+	WriteStringDMA(transferLine);	
+	*isNumber = 1;
+	for (i = 0 ; data[i] != '\0'; i++)
+	{
+		if (data[i] > '0' || data[i] < '9' || data[i] == '.' || data[i] == '\r' || data[i] == '\n')
+		;
+		else
+		{
+			*isNumber = 0;
+			break;
+		}				
+	}
+	res = atof(data);				
+	return res;
+}
+
+//--------------------------------------------------------------
 // Вывод меню
 //--------------------------------------------------------------
 void printMenu(void)
@@ -190,12 +226,13 @@ void printMenu(void)
 	WriteLine(" [4] Set size of the buffer of counting");
 	WriteLine(" [5] Set maximum amplitude of the modulating voltage");
 	WriteLine(" [6] Set constant of the modulating voltage");
-	WriteLine(" [7] Set constant of the modulating voltage");
-	WriteLine(" [8] Set limit accumulation");
-	WriteLine(" [9] Set adjustment coefficient");
-	WriteLine("[10] Set default configuration");
-	WriteLine("[11] Get configuration");
-	WriteLine("[12] Exit terminal");
+	WriteLine(" [7] Set bw freq");
+	WriteLine(" [8] Set bw Real freq");
+	WriteLine(" [9] Set limit accumulation");
+	WriteLine("[10] Set adjustment coefficient");
+	WriteLine("[11] Set default configuration");
+	WriteLine("[12] Get configuration");
+	WriteLine("[13] Exit terminal");
 	WriteString("\r\n>> ");
 }
 
@@ -511,6 +548,64 @@ int freqBwHandler(uint8_t* freqBw0Param, uint8_t* freqBw1Param)
 	}
 }
 
+uint8_t calcBwFreqFromReal(float freq, uint32_t freqMod, uint32_t coefAdj)
+{
+	return (uint8_t)(freq / freqMod * coefAdj / 100);
+}
+
+//--------------------------------------------------------------
+// Задание полосы пропускания частоты биений
+//--------------------------------------------------------------
+int freqBwRealHandler(uint8_t* freqBw0Param, uint8_t* freqBw1Param,  uint32_t freqMod, uint32_t coefAdj)
+{
+	float result0, result1;
+	int isNumber0, isNumber1;
+	char freqBw0[] = "Set lower bound:\r\n";
+	char freqBw1[] = "Set upper bound:\r\n";
+	char freqBw[] = "Bandwidth of frequency of beats: [";
+	char freqBwPoint[] = ",";
+	char freqBwScob[] = "]";
+	
+	while (1)
+	{
+		WriteStringDMA(freqBw0);
+		WriteStringDMA(cursor);		
+		result0 = readDataFloat(&isNumber0);
+		
+		WriteStringDMA(freqBw1);
+		WriteStringDMA(cursor);				
+		result1 = readDataFloat(&isNumber1);
+
+		// Обработка ошибки
+		if (isNumber0 == 0 || isNumber1 == 0)
+		{
+			printError(incorInp);		
+		}
+		else if (result0 >= result1)
+		{			
+			printError(freqBwRealError);	
+		}
+		else if ((result0 > 255) || (result1 > 255))
+		{			
+		 	printError(freqBwRealError);
+		}
+		else
+		{
+			*freqBw0Param = calcBwFreqFromReal(result0, freqMod, coefAdj);
+			*freqBw1Param = calcBwFreqFromReal(result1, freqMod, coefAdj);
+			
+			// Вывод freqBw
+			WriteStringDMA(freqBw);
+			WriteInt(*freqBw0Param);
+			WriteStringDMA(freqBwPoint);	
+			WriteInt(*freqBw1Param);
+			WriteStringDMA(freqBwScob);
+			WriteStringDMA(transferLine);			
+			return *freqBw0Param;
+		}
+	}
+}
+
 //--------------------------------------------------------------
 // Задание порога накопления
 //--------------------------------------------------------------
@@ -644,6 +739,7 @@ void  printError(typeError localError)
 	char bufModeErrorArr[] = "error bufModeError: Incorrect length buffer(values less 256)\r\n\n";
 	char amplModErrorArr[] = "error amplModError: Incorrect amplitude(sinus - less 2048, other - less 4096)\r\n\n";
 	char freqBwErrorArr[] = "error freqBwError: Incorrect bandwidth\r\n\n";
+	char freqBwRealErrorArr[] = "error freqBwError: Incorrect freq bandwidth\r\n\n";
 	char coefAdjErrorArr[] = "error coefAdjError: Incorrect coefficient(values in the range 0-100)\r\n\n";
 	char constModeErrorArr[] = "error constModeError: Incorrect constant(values less 4096)\r\n\n";
 	
@@ -667,6 +763,9 @@ void  printError(typeError localError)
 		case freqBwError:
 			WriteStringDMA(freqBwErrorArr);
 			break;
+		case freqBwRealError:
+			WriteStringDMA(freqBwRealErrorArr);
+			break;			
 		case coefAdjError:
 			WriteStringDMA(coefAdjErrorArr);
 			break;
