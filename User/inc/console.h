@@ -52,5 +52,6 @@ void printConfig(rdParam param);
 void printError(typeError localError);
 
 uint8_t calcBwFreqFromReal(float freq, uint32_t freqMod, uint32_t coefAdj);
+float calcRealFreqFromBw(uint8_t bw, uint32_t freqMod, uint32_t coefAdj);
 #endif
 

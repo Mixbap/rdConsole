@@ -150,6 +150,26 @@ void WriteIntNl(uint32_t value)
 	WriteStringDMA(transferLine);
 }
 
+//-----------------------------------------------------------------------------
+// Выводит вещественное число в порт
+//-----------------------------------------------------------------------------
+void WriteFloat(float value)
+{
+	char data[17] = {0};
+	sprintf(data, "%f", value);
+	WriteStringDMA(data);
+}
+
+//-----------------------------------------------------------------------------
+// Выводит вещественное число в порт с переводом строки в конце
+//-----------------------------------------------------------------------------
+void WriteFloanNl(float value)
+{
+	WriteFloat(value);
+	WriteStringDMA(transferLine);
+}
+
+
 //--------------------------------------------------------------
 // Считывает из порта целое число,
 //  isNumber - флаг того было ли введено число, 
@@ -553,6 +573,11 @@ uint8_t calcBwFreqFromReal(float freq, uint32_t freqMod, uint32_t coefAdj)
 	return (uint8_t)(freq / freqMod * coefAdj / 100);
 }
 
+float calcRealFreqFromBw(uint8_t bw, uint32_t freqMod, uint32_t coefAdj)
+{
+	return (float)(freqMod*bw) / coefAdj * 100;
+}
+
 //--------------------------------------------------------------
 // Задание полосы пропускания частоты биений
 //--------------------------------------------------------------
@@ -687,6 +712,8 @@ void printConfig(rdParam localParam)
 	char freqBw[] = "Bandwidth of frequency of beats:             [";
 	char freqBwPoint[] = ",";
 	char freqBwScob[] = "]";
+	char freqBwReal[] = "Real freq diap: [";	
+
 	char limit[] = "Limit accumulation:                          ";
 	char coef[] = "Adjustment coefficient:                      ";
 
@@ -715,6 +742,14 @@ void printConfig(rdParam localParam)
 	WriteInt(localParam.freqBw0);
 	WriteStringDMA(freqBwPoint);
 	WriteInt(localParam.freqBw1);
+	WriteStringDMA(freqBwScob);
+	WriteStringDMA(transferLine);
+
+
+	WriteStringDMA(freqBwReal);
+	WriteFloat(calcRealFreqFromBw(localParam.freqBw0, localParam.freqMod, localParam.coefAdj));
+	WriteStringDMA(freqBwPoint);
+	WriteFloat(calcRealFreqFromBw(localParam.freqBw1, localParam.freqMod, localParam.coefAdj));
 	WriteStringDMA(freqBwScob);
 	WriteStringDMA(transferLine);
 		
